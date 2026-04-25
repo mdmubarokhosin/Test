@@ -1,0 +1,192 @@
+<!-- failed.html - Payment Failed | ShighroPay -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Failed | ShighroPay</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>S</text></svg>">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <script>tailwind.config={darkMode:'class',theme:{extend:{colors:{'bd-green':'#006A4E','bd-red':'#F42A41'}}}}</script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body{font-family:'Inter',sans-serif}
+        .error-icon{width:100px;height:100px;border-radius:50%;background:linear-gradient(135deg,#dc2626,#b91c1c);display:flex;align-items:center;justify-content:center;animation:shake .5s ease}
+        @keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-5px)}40%,80%{transform:translateX(5px)}}
+        .fade-up{animation:fadeUp .5s ease forwards;opacity:0}
+        @keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+        .retry-btn{transition:all .2s}.retry-btn:hover{transform:translateY(-2px);box-shadow:0 8px 25px rgba(0,106,78,.2)}
+        .method-card{transition:all .2s;cursor:pointer}.method-card:hover{transform:translateY(-2px);box-shadow:0 5px 15px rgba(0,0,0,.1)}
+        .countdown-ring{width:50px;height:50px;border-radius:50%;border:3px solid #e5e7eb;border-top-color:#006A4E;animation:spin 1s linear infinite}
+        @keyframes spin{to{transform:rotate(360deg)}}
+    </style>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 min-h-screen flex flex-col">
+
+<header class="bg-white dark:bg-gray-800 shadow-sm">
+    <div class="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+            <div class="w-9 h-9 bg-bd-green rounded-lg flex items-center justify-center text-white font-bold text-lg">S</div>
+            <h1 class="font-bold text-gray-800 dark:text-white">ShighroPay</h1>
+        </div>
+        <button onclick="toggleDarkMode()" class="p-2 text-gray-400 hover:text-bd-green"><i class="bi bi-moon-stars" id="darkModeIcon"></i></button>
+    </div>
+</header>
+
+<main class="flex-1 flex items-center justify-center p-4 sm:p-6">
+    <div class="w-full max-w-md text-center">
+        <!-- Error Icon -->
+        <div class="error-icon mx-auto mb-6">
+            <i class="bi bi-x-lg text-white text-5xl"></i>
+        </div>
+
+        <h2 class="text-2xl font-bold text-gray-800 dark:text-white mb-2">Payment Failed</h2>
+        <p class="text-gray-500 text-sm mb-6" id="error-msg">Something went wrong with your payment</p>
+
+        <!-- Error Details Card -->
+        <div class="fade-up bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700 overflow-hidden" style="animation-delay:.2s">
+            <div class="bg-red-50 dark:bg-red-900/20 p-4 border-b border-red-100 dark:border-red-800">
+                <div class="flex items-center gap-2 text-red-600"><i class="bi bi-exclamation-circle-fill"></i><span class="font-semibold text-sm">Transaction Details</span></div>
+            </div>
+            <div class="p-5 space-y-3 text-sm">
+                <div class="flex justify-between pb-2 border-b border-gray-50 dark:border-gray-700"><span class="text-gray-500">Amount</span><span class="font-bold text-gray-800 dark:text-white" id="fail-amount">&#x09F3; 0</span></div>
+                <div class="flex justify-between pb-2 border-b border-gray-50 dark:border-gray-700"><span class="text-gray-500">Method</span><span class="font-medium" id="fail-method">-</span></div>
+                <div class="flex justify-between pb-2 border-b border-gray-50 dark:border-gray-700"><span class="text-gray-500">Error Code</span><span class="font-mono text-red-600 text-xs" id="fail-error-code">ERR_UNKNOWN</span></div>
+                <div class="flex justify-between"><span class="text-gray-500">Time</span><span class="text-gray-600 dark:text-gray-400" id="fail-time">-</span></div>
+            </div>
+        </div>
+
+        <!-- Troubleshooting Tips -->
+        <div class="fade-up mt-5 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-5 text-left" style="animation-delay:.3s">
+            <h4 class="font-bold text-sm text-gray-800 dark:text-white mb-3"><i class="bi bi-lightbulb text-amber-500 mr-1"></i> Troubleshooting</h4>
+            <ul class="space-y-2 text-xs text-gray-500">
+                <li class="flex items-start gap-2"><i class="bi bi-check-circle text-emerald-500 mt-0.5"></i> Check your mobile banking account balance</li>
+                <li class="flex items-start gap-2"><i class="bi bi-check-circle text-emerald-500 mt-0.5"></i> Ensure your account is not blocked or frozen</li>
+                <li class="flex items-start gap-2"><i class="bi bi-check-circle text-emerald-500 mt-0.5"></i> Check if the amount is within your daily limit</li>
+                <li class="flex items-start gap-2"><i class="bi bi-check-circle text-emerald-500 mt-0.5"></i> Verify your phone number is correct</li>
+                <li class="flex items-start gap-2"><i class="bi bi-check-circle text-emerald-500 mt-0.5"></i> Try again after a few minutes if network issue</li>
+            </ul>
+        </div>
+
+        <!-- Auto Retry -->
+        <div class="fade-up mt-5 bg-amber-50 dark:bg-amber-900/20 rounded-2xl border border-amber-100 dark:border-amber-800 p-4" style="animation-delay:.4s" id="auto-retry-section">
+            <div class="flex items-center justify-center gap-3">
+                <div class="countdown-ring" id="retry-spinner"></div>
+                <div class="text-left">
+                    <p class="text-sm font-semibold text-amber-700 dark:text-amber-300">Auto-retrying in <span id="retry-countdown">30</span>s</p>
+                    <p class="text-[10px] text-amber-600">or click button below to retry now</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="fade-up mt-5 space-y-3" style="animation-delay:.5s">
+            <button onclick="retryPayment()" class="retry-btn w-full bg-bd-green hover:bg-emerald-800 text-white font-semibold py-3 rounded-xl transition-all flex items-center justify-center gap-2 shadow-lg shadow-emerald-200 dark:shadow-none"><i class="bi bi-arrow-clockwise"></i> Try Again</button>
+            <div class="grid grid-cols-2 gap-3">
+                <button onclick="tryDifferentMethod()" class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 py-2.5 rounded-xl text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors flex items-center justify-center gap-1"><i class="bi bi-arrow-left-right"></i> Change Method</button>
+                <button onclick="openSupportTicket()" class="bg-blue-50 dark:bg-blue-900/30 border border-blue-100 dark:border-blue-800 text-blue-600 py-2.5 rounded-xl text-sm font-medium hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-colors flex items-center justify-center gap-1"><i class="bi bi-headset"></i> Get Help</button>
+            </div>
+            <a href="dashboard.html" class="block text-center text-sm text-gray-500 hover:text-bd-green transition-colors mt-2"><i class="bi bi-grid mr-1"></i> Go to Dashboard</a>
+        </div>
+
+        <!-- Alternative Methods -->
+        <div class="fade-up mt-6 hidden" id="alt-methods-section" style="animation-delay:.5s">
+            <h4 class="font-bold text-sm text-gray-800 dark:text-white mb-3">Try a Different Method</h4>
+            <div class="grid grid-cols-2 gap-3" id="alt-methods-grid"></div>
+        </div>
+
+        <!-- FAQ Section -->
+        <div class="fade-up mt-5 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-5 text-left" style="animation-delay:.45s">
+            <h4 class="font-bold text-sm text-gray-800 dark:text-white mb-3"><i class="bi bi-question-circle mr-1"></i> Frequently Asked Questions</h4>
+            <div class="space-y-2">
+                <details class="group"><summary class="flex items-center justify-between cursor-pointer text-xs font-medium text-gray-700 dark:text-gray-300 p-2 bg-gray-50 dark:bg-gray-700 rounded-lg"><span>Why did my payment fail?</span><i class="bi bi-chevron-down text-gray-400 group-open:rotate-180 transition-transform"></i></summary><p class="text-xs text-gray-500 p-2 pt-1">Payments can fail due to insufficient balance, network issues, incorrect credentials, or daily transaction limits being reached.</p></details>
+                <details class="group"><summary class="flex items-center justify-between cursor-pointer text-xs font-medium text-gray-700 dark:text-gray-300 p-2 bg-gray-50 dark:bg-gray-700 rounded-lg"><span>Will I be charged for a failed payment?</span><i class="bi bi-chevron-down text-gray-400 group-open:rotate-180 transition-transform"></i></summary><p class="text-xs text-gray-500 p-2 pt-1">No. Failed payments are not processed and no amount is deducted. If you see a deduction, it will be auto-reversed within 24-72 hours.</p></details>
+                <details class="group"><summary class="flex items-center justify-between cursor-pointer text-xs font-medium text-gray-700 dark:text-gray-300 p-2 bg-gray-50 dark:bg-gray-700 rounded-lg"><span>How do I contact support?</span><i class="bi bi-chevron-down text-gray-400 group-open:rotate-180 transition-transform"></i></summary><p class="text-xs text-gray-500 p-2 pt-1">Click the "Get Help" button above to submit a support ticket, or visit our <a href="contact.html" class="text-bd-green hover:underline">contact page</a>.</p></details>
+            </div>
+        </div>
+
+        <!-- Support Ticket Form -->
+        <div class="fade-up mt-5 hidden bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-5 text-left" id="support-form">
+            <h4 class="font-bold text-sm text-gray-800 dark:text-white mb-3"><i class="bi bi-headset mr-1"></i> Submit Support Ticket</h4>
+            <div class="space-y-3">
+                <div><label class="text-xs text-gray-500 block mb-1">Your Name</label><input type="text" id="support-name" class="w-full px-3 py-2 border border-gray-200 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-700"></div>
+                <div><label class="text-xs text-gray-500 block mb-1">Email</label><input type="email" id="support-email" class="w-full px-3 py-2 border border-gray-200 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-700"></div>
+                <div><label class="text-xs text-gray-500 block mb-1">Describe the issue</label><textarea id="support-desc" class="w-full px-3 py-2 border border-gray-200 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-700" rows="3" placeholder="Please describe what happened..."></textarea></div>
+                <button onclick="submitSupportTicket()" class="w-full bg-blue-600 text-white py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors">Submit Ticket</button>
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer class="text-center py-4 text-xs text-gray-400">&copy; 2025 ShighroPay. All rights reserved.</footer>
+
+<script type="module">
+    import{initializeApp}from"https://www.gstatic.com/firebasejs/11.7.3/firebase-app.js";
+    import{getDatabase,ref,push,set}from"https://www.gstatic.com/firebasejs/11.7.3/firebase-database.js";
+    import{getAuth,signInAnonymously}from"https://www.gstatic.com/firebasejs/11.7.3/firebase-auth.js";
+
+    const app=initializeApp({apiKey:"AIzaSyB7vT31Tx4Qkh5jiC73Twi5q7TbuWIt_-0",authDomain:"mypaymentgateway.firebaseapp.com",databaseURL:"https://mypaymentgateway-default-rtdb.firebaseio.com",projectId:"mypaymentgateway",storageBucket:"mypaymentgateway.firebasestorage.app",messagingSenderId:"896209913541",appId:"1:896209913541:web:39616c9e978b8d0a3c92ac"});
+    const db=getDatabase(app);const auth=getAuth(app);
+
+    const params=new URLSearchParams(window.location.search);
+    const error=params.get('error')||'Transaction could not be completed';
+    const amount=params.get('amount')||'0';
+    const method=params.get('method')||'';
+
+    function fmtAmt(n){return '\u09F3 '+Number(n||0).toLocaleString('en-BD',{minimumFractionDigits:2,maximumFractionDigits:2})}
+    const methodNames={bkash:'bKash',nagad:'Nagad',rocket:'Rocket',upay:'Upay'};
+
+    document.getElementById('error-msg').textContent=decodeURIComponent(error);
+    document.getElementById('fail-amount').textContent=fmtAmt(amount);
+    document.getElementById('fail-method').textContent=methodNames[method]||method||'N/A';
+    document.getElementById('fail-error-code').textContent='ERR_'+Date.now().toString(36).toUpperCase().substring(0,6);
+    document.getElementById('fail-time').textContent=new Date().toLocaleString('en-GB',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'});
+
+    // Dark mode
+    window.toggleDarkMode=function(){document.documentElement.classList.toggle('dark');localStorage.setItem('darkMode',document.documentElement.classList.contains('dark'));document.getElementById('darkModeIcon').className=document.documentElement.classList.contains('dark')?'bi bi-sun':'bi bi-moon-stars'};
+    if(localStorage.getItem('darkMode')==='true'){document.documentElement.classList.add('dark');document.getElementById('darkModeIcon').className='bi bi-sun'}
+
+    // Auto retry countdown
+    let countdown=30;
+    const retryInterval=setInterval(()=>{
+        countdown--;
+        document.getElementById('retry-countdown').textContent=countdown;
+        if(countdown<=0){clearInterval(retryInterval);retryPayment()}
+    },1000);
+
+    window.retryPayment=function(){clearInterval(retryInterval);window.location.href='index.html'};
+
+    window.tryDifferentMethod=function(){
+        const section=document.getElementById('alt-methods-section');
+        section.classList.toggle('hidden');
+        if(!section.classList.contains('hidden')){
+            const methods=[{key:'bkash',name:'bKash',color:'bg-pink-600'},{key:'nagad',name:'Nagad',color:'bg-orange-500'},{key:'rocket',name:'Rocket',color:'bg-purple-700'},{key:'upay',name:'Upay',color:'bg-teal-500'}].filter(m=>m.key!==method);
+            document.getElementById('alt-methods-grid').innerHTML=methods.map(m=>'<div class="method-card bg-white dark:bg-gray-800 p-4 rounded-xl border border-gray-200 dark:border-gray-700 text-center cursor-pointer" onclick="window.location.href=\'index.html\'"><div class="w-10 h-10 '+m.color+' rounded-lg flex items-center justify-center text-white font-bold mx-auto mb-2">'+m.name.charAt(0)+'</div><span class="text-sm font-medium text-gray-800 dark:text-white">'+m.name+'</span></div>').join('');
+        }
+    };
+
+    window.openSupportTicket=function(){
+        document.getElementById('support-form').classList.toggle('hidden');
+    };
+
+    window.submitSupportTicket=function(){
+        const name=document.getElementById('support-name').value.trim();
+        const email=document.getElementById('support-email').value.trim();
+        const desc=document.getElementById('support-desc').value.trim();
+        if(!name||!desc){alert('Please fill name and description');return}
+        const ticketRef=push(ref(db,'tickets'));
+        set(ticketRef,{subject:'Payment Failed - Support Request',customerName:name,customerEmail:email,description:'Payment Error: '+decodeURIComponent(error)+'\nAmount: \u09F3'+amount+'\nMethod: '+(methodNames[method]||method)+'\n\nUser Description: '+desc,priority:'high',status:'open',createdAt:new Date().toISOString()}).then(()=>{
+            document.getElementById('support-form').innerHTML='<div class="text-center py-4"><i class="bi bi-check-circle text-emerald-500 text-3xl block mb-2"></i><h4 class="font-bold text-sm text-gray-800 dark:text-white">Ticket Submitted!</h4><p class="text-xs text-gray-500 mt-1">Ticket #'+ticketRef.key.substring(0,8)+'</p><p class="text-xs text-gray-400 mt-1">Our team will get back to you shortly</p></div>';
+        }).catch(err=>{alert('Error: '+err.message)});
+    };
+
+    signInAnonymously(auth).catch(()=>{});
+
+    // Track error in Firebase
+    signInAnonymously(auth).then(()=>{
+        push(ref(db,'error_logs'),{error:decodeURIComponent(error),amount:Number(amount),method,timestamp:new Date().toISOString(),page:'failed.html'});
+    });
+</script>
+</body>
+</html>

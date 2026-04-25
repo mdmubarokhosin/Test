@@ -1,0 +1,165 @@
+<!-- contact.html - Contact & Support | ShighroPay -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact & Support | ShighroPay</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>S</text></svg>">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <script>tailwind.config={darkMode:'class',theme:{extend:{colors:{'bd-green':'#006A4E','bd-red':'#F42A41'}}}}</script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body{font-family:'Inter',sans-serif}
+        .fade-in{animation:fadeIn .5s ease}
+        @keyframes fadeIn{from{opacity:0;transform:translateY(15px)}to{opacity:1;transform:translateY(0)}}
+        .toast-container{position:fixed;top:1rem;right:1rem;z-index:9999;display:flex;flex-direction:column;gap:.5rem}
+        .toast{padding:.75rem 1.25rem;border-radius:.5rem;color:#fff;font-size:.875rem;box-shadow:0 10px 25px rgba(0,0,0,.15);animation:slideIn .3s}
+        .toast-success{background:#059669}.toast-error{background:#dc2626}.toast-info{background:#2563eb}
+        @keyframes slideIn{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
+    </style>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 min-h-screen flex flex-col">
+<div class="toast-container" id="toastContainer"></div>
+
+<header class="bg-white dark:bg-gray-800 shadow-sm sticky top-0 z-10">
+    <div class="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
+        <a href="index.html" class="flex items-center gap-3">
+            <div class="w-9 h-9 bg-bd-green rounded-lg flex items-center justify-center text-white font-bold text-lg">S</div>
+            <h1 class="font-bold text-lg text-gray-800 dark:text-white">ShighroPay</h1>
+        </a>
+        <div class="flex gap-2">
+            <button onclick="document.documentElement.classList.toggle('dark');localStorage.setItem('darkMode',document.documentElement.classList.contains('dark'))" class="p-2 text-gray-400 hover:text-bd-green"><i class="bi bi-moon-stars"></i></button>
+            <a href="dashboard.html" class="px-4 py-2 bg-bd-green text-white rounded-lg text-sm hover:bg-emerald-800">Dashboard</a>
+        </div>
+    </div>
+</header>
+
+<main class="flex-1 max-w-4xl mx-auto px-4 sm:px-6 py-8 fade-in">
+    <div class="text-center mb-8">
+        <h2 class="text-3xl font-bold text-gray-800 dark:text-white mb-2">Contact & Support</h2>
+        <p class="text-gray-500">Have questions? We're here to help.</p>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Contact Info -->
+        <div class="space-y-4">
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-5">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="w-10 h-10 bg-emerald-100 dark:bg-emerald-900/30 rounded-xl flex items-center justify-center"><i class="bi bi-envelope text-emerald-600"></i></div>
+                    <div><h4 class="font-bold text-sm text-gray-800 dark:text-white">Email</h4><p class="text-xs text-gray-500">support@shighropay.com</p></div>
+                </div>
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="w-10 h-10 bg-blue-100 dark:bg-blue-900/30 rounded-xl flex items-center justify-center"><i class="bi bi-telephone text-blue-600"></i></div>
+                    <div><h4 class="font-bold text-sm text-gray-800 dark:text-white">Phone</h4><p class="text-xs text-gray-500">+880-1XXX-XXXXXX</p></div>
+                </div>
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="w-10 h-10 bg-purple-100 dark:bg-purple-900/30 rounded-xl flex items-center justify-center"><i class="bi bi-geo-alt text-purple-600"></i></div>
+                    <div><h4 class="font-bold text-sm text-gray-800 dark:text-white">Address</h4><p class="text-xs text-gray-500">Dhaka, Bangladesh</p></div>
+                </div>
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-amber-100 dark:bg-amber-900/30 rounded-xl flex items-center justify-center"><i class="bi bi-clock text-amber-600"></i></div>
+                    <div><h4 class="font-bold text-sm text-gray-800 dark:text-white">Hours</h4><p class="text-xs text-gray-500">24/7 Online Support</p></div>
+                </div>
+            </div>
+
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-5">
+                <h4 class="font-bold text-sm text-gray-800 dark:text-white mb-3">Social Media</h4>
+                <div class="grid grid-cols-4 gap-2">
+                    <a href="#" class="flex flex-col items-center gap-1 p-2 rounded-xl bg-blue-50 dark:bg-blue-900/30 hover:bg-blue-100 transition-colors"><i class="bi bi-facebook text-blue-600"></i><span class="text-[9px] text-gray-500">Facebook</span></a>
+                    <a href="#" class="flex flex-col items-center gap-1 p-2 rounded-xl bg-sky-50 dark:bg-sky-900/30 hover:bg-sky-100 transition-colors"><i class="bi bi-twitter-x text-gray-800 dark:text-white"></i><span class="text-[9px] text-gray-500">Twitter</span></a>
+                    <a href="#" class="flex flex-col items-center gap-1 p-2 rounded-xl bg-green-50 dark:bg-green-900/30 hover:bg-green-100 transition-colors"><i class="bi bi-whatsapp text-green-600"></i><span class="text-[9px] text-gray-500">WhatsApp</span></a>
+                    <a href="#" class="flex flex-col items-center gap-1 p-2 rounded-xl bg-red-50 dark:bg-red-900/30 hover:bg-red-100 transition-colors"><i class="bi bi-youtube text-red-600"></i><span class="text-[9px] text-gray-500">YouTube</span></a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contact Form -->
+        <div class="lg:col-span-2 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
+            <h3 class="font-bold text-lg text-gray-800 dark:text-white mb-5">Send us a Message</h3>
+            <div class="space-y-4">
+                <div class="grid grid-cols-2 gap-4">
+                    <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Name</label><input type="text" id="contact-name" class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-600 rounded-xl text-sm bg-white dark:bg-gray-700 focus:ring-2 focus:ring-bd-green focus:border-bd-green outline-none" placeholder="Your name"></div>
+                    <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email</label><input type="email" id="contact-email" class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-600 rounded-xl text-sm bg-white dark:bg-gray-700 focus:ring-2 focus:ring-bd-green focus:border-bd-green outline-none" placeholder="your@email.com"></div>
+                </div>
+                <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Phone</label><input type="tel" id="contact-phone" class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-600 rounded-xl text-sm bg-white dark:bg-gray-700 focus:ring-2 focus:ring-bd-green focus:border-bd-green outline-none" placeholder="01XXXXXXXXX"></div>
+                <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Subject</label>
+                    <select id="contact-subject" class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-600 rounded-xl text-sm bg-white dark:bg-gray-700 focus:ring-2 focus:ring-bd-green outline-none">
+                        <option value="">Select a topic</option>
+                        <option value="payment">Payment Issue</option>
+                        <option value="refund">Refund Request</option>
+                        <option value="account">Account Issue</option>
+                        <option value="merchant">Merchant Inquiry</option>
+                        <option value="technical">Technical Support</option>
+                        <option value="feedback">Feedback</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Transaction ID (if applicable)</label><input type="text" id="contact-txid" class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-600 rounded-xl text-sm bg-white dark:bg-gray-700 focus:ring-2 focus:ring-bd-green focus:border-bd-green outline-none" placeholder="Optional - enter your transaction ID"></div>
+                <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Message</label><textarea id="contact-message" rows="4" class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-600 rounded-xl text-sm bg-white dark:bg-gray-700 focus:ring-2 focus:ring-bd-green focus:border-bd-green outline-none resize-none" placeholder="Describe your issue or question..."></textarea></div>
+                <button onclick="submitContact()" class="w-full bg-bd-green text-white py-3 rounded-xl font-medium hover:bg-emerald-800 transition-colors flex items-center justify-center gap-2"><i class="bi bi-send"></i> Send Message</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- FAQ -->
+    <div class="mt-8 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
+        <h3 class="font-bold text-lg text-gray-800 dark:text-white mb-5"><i class="bi bi-question-circle mr-2"></i>Frequently Asked Questions</h3>
+        <div class="space-y-2">
+            <details class="group border border-gray-100 dark:border-gray-700 rounded-xl overflow-hidden"><summary class="flex items-center justify-between cursor-pointer text-sm font-medium text-gray-700 dark:text-gray-300 p-4 hover:bg-gray-50 dark:hover:bg-gray-700/50"><span>How do I make a payment?</span><i class="bi bi-chevron-down text-gray-400 group-open:rotate-180 transition-transform"></i></summary><p class="text-sm text-gray-500 px-4 pb-4">Visit our <a href="index.html" class="text-bd-green hover:underline">payment page</a>, fill in your details, select your preferred payment method, and follow the prompts to complete your payment.</p></details>
+            <details class="group border border-gray-100 dark:border-gray-700 rounded-xl overflow-hidden"><summary class="flex items-center justify-between cursor-pointer text-sm font-medium text-gray-700 dark:text-gray-300 p-4 hover:bg-gray-50 dark:hover:bg-gray-700/50"><span>What payment methods are supported?</span><i class="bi bi-chevron-down text-gray-400 group-open:rotate-180 transition-transform"></i></summary><p class="text-sm text-gray-500 px-4 pb-4">We support bKash, Nagad, Rocket, Upay, and SureCash mobile financial services.</p></details>
+            <details class="group border border-gray-100 dark:border-gray-700 rounded-xl overflow-hidden"><summary class="flex items-center justify-between cursor-pointer text-sm font-medium text-gray-700 dark:text-gray-300 p-4 hover:bg-gray-50 dark:hover:bg-gray-700/50"><span>How long do refunds take?</span><i class="bi bi-chevron-down text-gray-400 group-open:rotate-180 transition-transform"></i></summary><p class="text-sm text-gray-500 px-4 pb-4">Refunds are typically processed within 5-10 business days depending on the payment method used. You will receive a notification once the refund has been processed.</p></details>
+            <details class="group border border-gray-100 dark:border-gray-700 rounded-xl overflow-hidden"><summary class="flex items-center justify-between cursor-pointer text-sm font-medium text-gray-700 dark:text-gray-300 p-4 hover:bg-gray-50 dark:hover:bg-gray-700/50"><span>Is my payment information secure?</span><i class="bi bi-chevron-down text-gray-400 group-open:rotate-180 transition-transform"></i></summary><p class="text-sm text-gray-500 px-4 pb-4">Yes, we use industry-standard SSL encryption to protect all data transmitted through our platform. Read our <a href="privacy.html" class="text-bd-green hover:underline">Privacy Policy</a> for more details.</p></details>
+            <details class="group border border-gray-100 dark:border-gray-700 rounded-xl overflow-hidden"><summary class="flex items-center justify-between cursor-pointer text-sm font-medium text-gray-700 dark:text-gray-300 p-4 hover:bg-gray-50 dark:hover:bg-gray-700/50"><span>How can I become a merchant?</span><i class="bi bi-chevron-down text-gray-400 group-open:rotate-180 transition-transform"></i></summary><p class="text-sm text-gray-500 px-4 pb-4">Visit our <a href="merchants.html" class="text-bd-green hover:underline">merchant registration page</a> to apply. We review applications within 24-48 hours.</p></details>
+            <details class="group border border-gray-100 dark:border-gray-700 rounded-xl overflow-hidden"><summary class="flex items-center justify-between cursor-pointer text-sm font-medium text-gray-700 dark:text-gray-300 p-4 hover:bg-gray-50 dark:hover:bg-gray-700/50"><span>What are the transaction limits?</span><i class="bi bi-chevron-down text-gray-400 group-open:rotate-180 transition-transform"></i></summary><p class="text-sm text-gray-500 px-4 pb-4">Default transaction limits are &#x09F3;10 minimum and &#x09F3;100,000 maximum per transaction. These limits can be customized for merchant accounts.</p></details>
+        </div>
+    </div>
+</main>
+
+<footer class="bg-white dark:bg-gray-800 border-t border-gray-100 dark:border-gray-700 mt-8">
+    <div class="max-w-4xl mx-auto px-4 py-4 flex flex-col sm:flex-row justify-between items-center text-xs text-gray-400 gap-2">
+        <p>&copy; 2025 ShighroPay. All rights reserved.</p>
+        <div class="flex gap-4"><a href="index.html" class="hover:text-bd-green">Home</a><a href="terms.html" class="hover:text-bd-green">Terms</a><a href="privacy.html" class="hover:text-bd-green">Privacy</a></div>
+    </div>
+</footer>
+
+<script type="module">
+    import{initializeApp}from"https://www.gstatic.com/firebasejs/11.7.3/firebase-app.js";
+    import{getDatabase,ref,push,set}from"https://www.gstatic.com/firebasejs/11.7.3/firebase-database.js";
+    import{getAuth,signInAnonymously}from"https://www.gstatic.com/firebasejs/11.7.3/firebase-auth.js";
+
+    const app=initializeApp({apiKey:"AIzaSyB7vT31Tx4Qkh5jiC73Twi5q7TbuWIt_-0",authDomain:"mypaymentgateway.firebaseapp.com",databaseURL:"https://mypaymentgateway-default-rtdb.firebaseio.com",projectId:"mypaymentgateway",storageBucket:"mypaymentgateway.firebasestorage.app",messagingSenderId:"896209913541",appId:"1:896209913541:web:39616c9e978b8d0a3c92ac"});
+    const db=getDatabase(app);const auth=getAuth(app);
+    signInAnonymously(auth).catch(()=>{});
+
+    function showToast(msg,type='info'){const c=document.getElementById('toastContainer');const t=document.createElement('div');t.className='toast toast-'+type;t.textContent=msg;c.appendChild(t);setTimeout(()=>{t.style.opacity='0';setTimeout(()=>t.remove(),300)},3000)}
+
+    window.submitContact=function(){
+        const name=document.getElementById('contact-name').value.trim();
+        const email=document.getElementById('contact-email').value.trim();
+        const phone=document.getElementById('contact-phone').value.trim();
+        const subject=document.getElementById('contact-subject').value;
+        const txId=document.getElementById('contact-txid').value.trim();
+        const message=document.getElementById('contact-message').value.trim();
+
+        if(!name||!email||!message){showToast('Please fill in required fields','error');return}
+        if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){showToast('Invalid email address','error');return}
+
+        const data={name,email,phone,subject,txId,message,status:'open',priority:'medium',timestamp:new Date().toISOString()};
+        const r=push(ref(db,'tickets'));
+        set(r,data).then(()=>{
+            showToast('Message sent successfully! We\'ll get back to you soon.','success');
+            document.getElementById('contact-name').value='';
+            document.getElementById('contact-email').value='';
+            document.getElementById('contact-phone').value='';
+            document.getElementById('contact-subject').value='';
+            document.getElementById('contact-txid').value='';
+            document.getElementById('contact-message').value='';
+        }).catch(()=>showToast('Failed to send message','error'));
+    };
+
+    if(localStorage.getItem('darkMode')==='true')document.documentElement.classList.add('dark');
+</script>
+</body>
+</html>

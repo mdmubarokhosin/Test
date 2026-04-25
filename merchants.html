@@ -1,0 +1,223 @@
+<!-- merchants.html - Merchant Registration | ShighroPay -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Become a Merchant | ShighroPay</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>S</text></svg>">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <script>tailwind.config={darkMode:'class',theme:{extend:{colors:{'bd-green':'#006A4E','bd-red':'#F42A41'}}}}</script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body{font-family:'Inter',sans-serif}
+        .fade-in{animation:fadeIn .5s ease}
+        @keyframes fadeIn{from{opacity:0;transform:translateY(15px)}to{opacity:1;transform:translateY(0)}}
+        .toast-container{position:fixed;top:1rem;right:1rem;z-index:9999;display:flex;flex-direction:column;gap:.5rem}
+        .toast{padding:.75rem 1.25rem;border-radius:.5rem;color:#fff;font-size:.875rem;box-shadow:0 10px 25px rgba(0,0,0,.15);animation:slideIn .3s}
+        .toast-success{background:#059669}.toast-error{background:#dc2626}.toast-info{background:#2563eb}
+        @keyframes slideIn{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
+        .feature-card{transition:all .2s}.feature-card:hover{transform:translateY(-3px);box-shadow:0 10px 30px -5px rgba(0,0,0,.1)}
+    </style>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 min-h-screen flex flex-col">
+<div class="toast-container" id="toastContainer"></div>
+
+<header class="bg-white dark:bg-gray-800 shadow-sm sticky top-0 z-10">
+    <div class="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
+        <a href="index.html" class="flex items-center gap-3">
+            <div class="w-9 h-9 bg-bd-green rounded-lg flex items-center justify-center text-white font-bold text-lg">S</div>
+            <h1 class="font-bold text-lg text-gray-800 dark:text-white">ShighroPay</h1>
+        </a>
+        <div class="flex gap-2">
+            <button onclick="document.documentElement.classList.toggle('dark');localStorage.setItem('darkMode',document.documentElement.classList.contains('dark'))" class="p-2 text-gray-400 hover:text-bd-green"><i class="bi bi-moon-stars"></i></button>
+            <a href="dashboard.html" class="px-4 py-2 bg-bd-green text-white rounded-lg text-sm hover:bg-emerald-800">Dashboard</a>
+        </div>
+    </div>
+</header>
+
+<main class="flex-1 fade-in">
+    <!-- Hero -->
+    <section class="bg-gradient-to-br from-bd-green to-emerald-700 text-white py-16 sm:py-20">
+        <div class="max-w-5xl mx-auto px-4 text-center">
+            <h2 class="text-3xl sm:text-4xl font-bold mb-4">Grow Your Business with ShighroPay</h2>
+            <p class="text-emerald-100 text-lg mb-8 max-w-2xl mx-auto">Accept payments from millions of mobile wallet users in Bangladesh. Fast setup, competitive rates, and real-time analytics.</p>
+            <a href="#register" class="inline-block px-8 py-3 bg-white text-bd-green font-bold rounded-xl hover:bg-emerald-50 transition-colors shadow-lg"><i class="bi bi-arrow-right-circle mr-2"></i>Register Now</a>
+        </div>
+    </section>
+
+    <!-- Features -->
+    <section class="max-w-5xl mx-auto px-4 py-12">
+        <h3 class="text-2xl font-bold text-gray-800 dark:text-white text-center mb-8">Why Choose ShighroPay?</h3>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            <div class="feature-card bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
+                <div class="w-12 h-12 bg-emerald-100 dark:bg-emerald-900/30 rounded-xl flex items-center justify-center mb-4"><i class="bi bi-lightning-charge text-2xl text-emerald-600"></i></div>
+                <h4 class="font-bold text-gray-800 dark:text-white mb-2">Instant Settlement</h4>
+                <p class="text-sm text-gray-500">Get your funds settled within 24 hours. No waiting, no delays.</p>
+            </div>
+            <div class="feature-card bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
+                <div class="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-xl flex items-center justify-center mb-4"><i class="bi bi-phone text-2xl text-blue-600"></i></div>
+                <h4 class="font-bold text-gray-800 dark:text-white mb-2">5+ Payment Methods</h4>
+                <p class="text-sm text-gray-500">Accept bKash, Nagad, Rocket, Upay, SureCash, and more.</p>
+            </div>
+            <div class="feature-card bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
+                <div class="w-12 h-12 bg-purple-100 dark:bg-purple-900/30 rounded-xl flex items-center justify-center mb-4"><i class="bi bi-graph-up-arrow text-2xl text-purple-600"></i></div>
+                <h4 class="font-bold text-gray-800 dark:text-white mb-2">Real-time Analytics</h4>
+                <p class="text-sm text-gray-500">Track transactions, revenue, and customer data in real time.</p>
+            </div>
+            <div class="feature-card bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
+                <div class="w-12 h-12 bg-amber-100 dark:bg-amber-900/30 rounded-xl flex items-center justify-center mb-4"><i class="bi bi-shield-lock text-2xl text-amber-600"></i></div>
+                <h4 class="font-bold text-gray-800 dark:text-white mb-2">Secure & Reliable</h4>
+                <p class="text-sm text-gray-500">PCI DSS compliant with 99.9% uptime guarantee.</p>
+            </div>
+            <div class="feature-card bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
+                <div class="w-12 h-12 bg-red-100 dark:bg-red-900/30 rounded-xl flex items-center justify-center mb-4"><i class="bi bi-code-slash text-2xl text-red-500"></i></div>
+                <h4 class="font-bold text-gray-800 dark:text-white mb-2">Easy Integration</h4>
+                <p class="text-sm text-gray-500">Simple API with webhook support. Integrate in minutes.</p>
+            </div>
+            <div class="feature-card bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
+                <div class="w-12 h-12 bg-teal-100 dark:bg-teal-900/30 rounded-xl flex items-center justify-center mb-4"><i class="bi bi-headset text-2xl text-teal-600"></i></div>
+                <h4 class="font-bold text-gray-800 dark:text-white mb-2">24/7 Support</h4>
+                <p class="text-sm text-gray-500">Dedicated support team available round the clock.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing -->
+    <section class="bg-gray-100 dark:bg-gray-800 py-12">
+        <div class="max-w-5xl mx-auto px-4">
+            <h3 class="text-2xl font-bold text-gray-800 dark:text-white text-center mb-8">Simple Pricing</h3>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-5 max-w-3xl mx-auto">
+                <div class="bg-white dark:bg-gray-700 p-6 rounded-2xl shadow-sm text-center border-2 border-gray-100 dark:border-gray-600">
+                    <h4 class="font-bold text-gray-800 dark:text-white mb-1">Starter</h4>
+                    <p class="text-3xl font-bold text-bd-green my-3">1.5%</p>
+                    <p class="text-xs text-gray-500 mb-4">per transaction</p>
+                    <ul class="text-xs text-gray-500 space-y-2 text-left">
+                        <li class="flex items-center gap-2"><i class="bi bi-check-circle text-emerald-500"></i> Up to 1000 tx/month</li>
+                        <li class="flex items-center gap-2"><i class="bi bi-check-circle text-emerald-500"></i> Basic analytics</li>
+                        <li class="flex items-center gap-2"><i class="bi bi-check-circle text-emerald-500"></i> Email support</li>
+                    </ul>
+                </div>
+                <div class="bg-white dark:bg-gray-700 p-6 rounded-2xl shadow-sm text-center border-2 border-bd-green relative">
+                    <div class="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-0.5 bg-bd-green text-white text-[10px] rounded-full font-bold">POPULAR</div>
+                    <h4 class="font-bold text-gray-800 dark:text-white mb-1">Business</h4>
+                    <p class="text-3xl font-bold text-bd-green my-3">1.0%</p>
+                    <p class="text-xs text-gray-500 mb-4">per transaction</p>
+                    <ul class="text-xs text-gray-500 space-y-2 text-left">
+                        <li class="flex items-center gap-2"><i class="bi bi-check-circle text-emerald-500"></i> Unlimited transactions</li>
+                        <li class="flex items-center gap-2"><i class="bi bi-check-circle text-emerald-500"></i> Advanced analytics</li>
+                        <li class="flex items-center gap-2"><i class="bi bi-check-circle text-emerald-500"></i> Priority support</li>
+                        <li class="flex items-center gap-2"><i class="bi bi-check-circle text-emerald-500"></i> API access</li>
+                    </ul>
+                </div>
+                <div class="bg-white dark:bg-gray-700 p-6 rounded-2xl shadow-sm text-center border-2 border-gray-100 dark:border-gray-600">
+                    <h4 class="font-bold text-gray-800 dark:text-white mb-1">Enterprise</h4>
+                    <p class="text-3xl font-bold text-bd-green my-3">Custom</p>
+                    <p class="text-xs text-gray-500 mb-4">contact us</p>
+                    <ul class="text-xs text-gray-500 space-y-2 text-left">
+                        <li class="flex items-center gap-2"><i class="bi bi-check-circle text-emerald-500"></i> Custom rates</li>
+                        <li class="flex items-center gap-2"><i class="bi bi-check-circle text-emerald-500"></i> Dedicated account manager</li>
+                        <li class="flex items-center gap-2"><i class="bi bi-check-circle text-emerald-500"></i> SLA guarantee</li>
+                        <li class="flex items-center gap-2"><i class="bi bi-check-circle text-emerald-500"></i> White-label option</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Registration Form -->
+    <section id="register" class="max-w-3xl mx-auto px-4 py-12">
+        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6 sm:p-8">
+            <h3 class="text-2xl font-bold text-gray-800 dark:text-white mb-2">Merchant Registration</h3>
+            <p class="text-sm text-gray-500 mb-6">Fill in your details and we'll get back to you within 24 hours.</p>
+            <div class="space-y-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Business Name *</label><input type="text" id="m-business" class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-600 rounded-xl text-sm bg-white dark:bg-gray-700 outline-none focus:ring-2 focus:ring-bd-green" placeholder="Your Business Name"></div>
+                    <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Contact Person *</label><input type="text" id="m-contact" class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-600 rounded-xl text-sm bg-white dark:bg-gray-700 outline-none focus:ring-2 focus:ring-bd-green" placeholder="Full Name"></div>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email *</label><input type="email" id="m-email" class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-600 rounded-xl text-sm bg-white dark:bg-gray-700 outline-none focus:ring-2 focus:ring-bd-green" placeholder="business@email.com"></div>
+                    <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Phone *</label><input type="tel" id="m-phone" class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-600 rounded-xl text-sm bg-white dark:bg-gray-700 outline-none focus:ring-2 focus:ring-bd-green" placeholder="01XXXXXXXXX"></div>
+                </div>
+                <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Business Type</label>
+                    <select id="m-type" class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-600 rounded-xl text-sm bg-white dark:bg-gray-700 outline-none focus:ring-2 focus:ring-bd-green">
+                        <option value="">Select business type</option>
+                        <option value="ecommerce">E-commerce</option>
+                        <option value="saas">SaaS / Software</option>
+                        <option value="education">Education</option>
+                        <option value="healthcare">Healthcare</option>
+                        <option value="food">Food & Delivery</option>
+                        <option value="travel">Travel & Tourism</option>
+                        <option value="retail">Retail</option>
+                        <option value="freelance">Freelancing</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Website URL (optional)</label><input type="url" id="m-website" class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-600 rounded-xl text-sm bg-white dark:bg-gray-700 outline-none focus:ring-2 focus:ring-bd-green" placeholder="https://yourbusiness.com"></div>
+                <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Expected Monthly Volume</label>
+                    <select id="m-volume" class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-600 rounded-xl text-sm bg-white dark:bg-gray-700 outline-none focus:ring-2 focus:ring-bd-green">
+                        <option value="">Select volume</option>
+                        <option value="0-50000">Under &#x09F3; 50,000</option>
+                        <option value="50000-200000">&#x09F3; 50,000 - &#x09F3; 2,00,000</option>
+                        <option value="200000-1000000">&#x09F3; 2,00,000 - &#x09F3; 10,00,000</option>
+                        <option value="1000000+">Above &#x09F3; 10,00,000</option>
+                    </select>
+                </div>
+                <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Additional Notes</label><textarea id="m-notes" rows="3" class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-600 rounded-xl text-sm bg-white dark:bg-gray-700 outline-none focus:ring-2 focus:ring-bd-green resize-none" placeholder="Tell us about your business..."></textarea></div>
+                <div class="flex items-start gap-2"><input type="checkbox" id="m-agree" class="mt-1 rounded text-bd-green focus:ring-bd-green"><label for="m-agree" class="text-xs text-gray-500">I agree to the <a href="terms.html" class="text-bd-green hover:underline">Terms of Service</a> and <a href="privacy.html" class="text-bd-green hover:underline">Privacy Policy</a></label></div>
+                <button onclick="submitMerchant()" class="w-full bg-bd-green text-white py-3 rounded-xl font-medium hover:bg-emerald-800 transition-colors flex items-center justify-center gap-2"><i class="bi bi-shop"></i> Submit Application</button>
+            </div>
+        </div>
+    </section>
+</main>
+
+<footer class="bg-white dark:bg-gray-800 border-t border-gray-100 dark:border-gray-700">
+    <div class="max-w-5xl mx-auto px-4 py-4 flex flex-col sm:flex-row justify-between items-center text-xs text-gray-400 gap-2">
+        <p>&copy; 2025 ShighroPay. All rights reserved.</p>
+        <div class="flex gap-4"><a href="index.html" class="hover:text-bd-green">Home</a><a href="terms.html" class="hover:text-bd-green">Terms</a><a href="privacy.html" class="hover:text-bd-green">Privacy</a><a href="contact.html" class="hover:text-bd-green">Contact</a></div>
+    </div>
+</footer>
+
+<script type="module">
+    import{initializeApp}from"https://www.gstatic.com/firebasejs/11.7.3/firebase-app.js";
+    import{getDatabase,ref,push,set}from"https://www.gstatic.com/firebasejs/11.7.3/firebase-database.js";
+    import{getAuth,signInAnonymously}from"https://www.gstatic.com/firebasejs/11.7.3/firebase-auth.js";
+
+    const app=initializeApp({apiKey:"AIzaSyB7vT31Tx4Qkh5jiC73Twi5q7TbuWIt_-0",authDomain:"mypaymentgateway.firebaseapp.com",databaseURL:"https://mypaymentgateway-default-rtdb.firebaseio.com",projectId:"mypaymentgateway",storageBucket:"mypaymentgateway.firebasestorage.app",messagingSenderId:"896209913541",appId:"1:896209913541:web:39616c9e978b8d0a3c92ac"});
+    const db=getDatabase(app);const auth=getAuth(app);
+    signInAnonymously(auth).catch(()=>{});
+
+    function showToast(msg,type='info'){const c=document.getElementById('toastContainer');const t=document.createElement('div');t.className='toast toast-'+type;t.textContent=msg;c.appendChild(t);setTimeout(()=>{t.style.opacity='0';setTimeout(()=>t.remove(),300)},3000)}
+
+    window.submitMerchant=function(){
+        const biz=document.getElementById('m-business').value.trim();
+        const contact=document.getElementById('m-contact').value.trim();
+        const email=document.getElementById('m-email').value.trim();
+        const phone=document.getElementById('m-phone').value.trim();
+        const type=document.getElementById('m-type').value;
+        const website=document.getElementById('m-website').value.trim();
+        const volume=document.getElementById('m-volume').value;
+        const notes=document.getElementById('m-notes').value.trim();
+        const agree=document.getElementById('m-agree').checked;
+
+        if(!biz||!contact||!email||!phone){showToast('Please fill in all required fields','error');return}
+        if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){showToast('Invalid email address','error');return}
+        if(!/^01[3-9]\d{8}$/.test(phone)){showToast('Invalid phone number','error');return}
+        if(!agree){showToast('Please agree to the terms','error');return}
+
+        const data={businessName:biz,contactPerson:contact,email,phone,businessType:type,website,expectedVolume:volume,notes,status:'pending',commission:1.5,createdAt:new Date().toISOString()};
+        const r=push(ref(db,'merchants'));
+        set(r,data).then(()=>{
+            showToast('Application submitted successfully! We will contact you within 24 hours.','success');
+            ['m-business','m-contact','m-email','m-phone','m-website','m-notes'].forEach(id=>document.getElementById(id).value='');
+            document.getElementById('m-type').value='';
+            document.getElementById('m-volume').value='';
+            document.getElementById('m-agree').checked=false;
+        }).catch(()=>showToast('Failed to submit application','error'));
+    };
+
+    if(localStorage.getItem('darkMode')==='true')document.documentElement.classList.add('dark');
+</script>
+</body>
+</html>

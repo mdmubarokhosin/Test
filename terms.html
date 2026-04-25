@@ -1,0 +1,122 @@
+<!-- terms.html - Terms of Service | ShighroPay -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Terms of Service | ShighroPay</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>S</text></svg>">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <script>tailwind.config={darkMode:'class',theme:{extend:{colors:{'bd-green':'#006A4E','bd-red':'#F42A41'}}}}</script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body{font-family:'Inter',sans-serif}
+        .prose h3{margin-top:1.5rem;margin-bottom:.75rem;font-weight:700;font-size:1.1rem;color:#1f2937}
+        .dark .prose h3{color:#fff}
+        .prose p,.prose li{font-size:.875rem;line-height:1.75;color:#6b7280}
+        .dark .prose p,.dark .prose li{color:#9ca3af}
+        .prose ul{list-style:disc;padding-left:1.5rem}
+        .prose ol{list-style:decimal;padding-left:1.5rem}
+    </style>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 min-h-screen flex flex-col">
+<header class="bg-white dark:bg-gray-800 shadow-sm sticky top-0 z-10">
+    <div class="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
+        <a href="index.html" class="flex items-center gap-3">
+            <div class="w-9 h-9 bg-bd-green rounded-lg flex items-center justify-center text-white font-bold text-lg">S</div>
+            <h1 class="font-bold text-lg text-gray-800 dark:text-white">ShighroPay</h1>
+        </a>
+        <div class="flex gap-2">
+            <button onclick="document.documentElement.classList.toggle('dark');localStorage.setItem('darkMode',document.documentElement.classList.contains('dark'))" class="p-2 text-gray-400 hover:text-bd-green"><i class="bi bi-moon-stars"></i></button>
+            <a href="dashboard.html" class="px-4 py-2 bg-bd-green text-white rounded-lg text-sm hover:bg-emerald-800">Dashboard</a>
+        </div>
+    </div>
+</header>
+
+<main class="flex-1 max-w-4xl mx-auto px-4 sm:px-6 py-8">
+    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6 sm:p-10">
+        <h2 class="text-3xl font-bold text-gray-800 dark:text-white mb-2">Terms of Service</h2>
+        <p class="text-sm text-gray-500 mb-8">Last updated: January 2025</p>
+
+        <div class="prose max-w-none">
+            <h3>1. Acceptance of Terms</h3>
+            <p>By accessing and using the ShighroPay payment gateway services ("Service"), you accept and agree to be bound by the terms and provisions of this agreement. If you do not agree to these terms, please do not use our services.</p>
+
+            <h3>2. Description of Service</h3>
+            <p>ShighroPay provides an online payment processing platform that enables users to make and receive payments through various mobile financial services including bKash, Nagad, Rocket, Upay, and SureCash. The service includes:</p>
+            <ul>
+                <li>Payment processing and transaction management</li>
+                <li>Customer relationship management (CRM) tools</li>
+                <li>Invoice generation and tracking</li>
+                <li>Reporting and analytics</li>
+                <li>Merchant management capabilities</li>
+            </ul>
+
+            <h3>3. User Accounts</h3>
+            <p>To access certain features of the Service, you may be required to create an account. You agree to:</p>
+            <ul>
+                <li>Provide accurate, current, and complete information</li>
+                <li>Maintain and promptly update your account information</li>
+                <li>Maintain the security and confidentiality of your login credentials</li>
+                <li>Accept responsibility for all activities under your account</li>
+                <li>Notify us immediately of any unauthorized use of your account</li>
+            </ul>
+
+            <h3>4. Payment Processing</h3>
+            <p>When using our payment processing services, you agree that:</p>
+            <ul>
+                <li>All transactions are subject to verification and approval</li>
+                <li>Transaction limits may apply as configured by the system administrator</li>
+                <li>Processing times may vary depending on the payment method</li>
+                <li>We reserve the right to hold, freeze, or reverse transactions suspected of fraud</li>
+                <li>Transaction fees may apply as disclosed at the time of payment</li>
+            </ul>
+
+            <h3>5. Refund Policy</h3>
+            <p>Refunds are subject to the following conditions:</p>
+            <ul>
+                <li>Refund requests must be submitted within 30 days of the original transaction</li>
+                <li>Refunds are processed through the original payment method</li>
+                <li>Processing time for refunds may take 5-10 business days</li>
+                <li>Certain transactions may not be eligible for refund</li>
+            </ul>
+
+            <h3>6. Prohibited Activities</h3>
+            <p>Users are prohibited from:</p>
+            <ul>
+                <li>Using the service for illegal or unauthorized purposes</li>
+                <li>Attempting to interfere with or disrupt the service</li>
+                <li>Processing fraudulent or unauthorized transactions</li>
+                <li>Violating any applicable laws or regulations</li>
+                <li>Impersonating another person or entity</li>
+            </ul>
+
+            <h3>7. Data Privacy</h3>
+            <p>Your use of the Service is also governed by our <a href="privacy.html" class="text-bd-green hover:underline">Privacy Policy</a>. By using the Service, you consent to the collection and use of your data as described in the Privacy Policy.</p>
+
+            <h3>8. Limitation of Liability</h3>
+            <p>ShighroPay shall not be liable for any indirect, incidental, special, consequential, or punitive damages resulting from your use of or inability to use the Service. Our total liability shall not exceed the total fees paid by you in the preceding 12 months.</p>
+
+            <h3>9. Modifications</h3>
+            <p>We reserve the right to modify these Terms of Service at any time. Changes will be effective immediately upon posting. Continued use of the Service after changes constitutes acceptance of the new terms.</p>
+
+            <h3>10. Governing Law</h3>
+            <p>These Terms shall be governed by and construed in accordance with the laws of Bangladesh. Any disputes shall be resolved through arbitration in Dhaka, Bangladesh.</p>
+
+            <h3>11. Contact Information</h3>
+            <p>For questions about these Terms of Service, please <a href="contact.html" class="text-bd-green hover:underline">contact us</a>.</p>
+        </div>
+    </div>
+</main>
+
+<footer class="bg-white dark:bg-gray-800 border-t border-gray-100 dark:border-gray-700 mt-8">
+    <div class="max-w-4xl mx-auto px-4 py-4 flex flex-col sm:flex-row justify-between items-center text-xs text-gray-400 gap-2">
+        <p>&copy; 2025 ShighroPay. All rights reserved.</p>
+        <div class="flex gap-4"><a href="index.html" class="hover:text-bd-green">Home</a><a href="privacy.html" class="hover:text-bd-green">Privacy</a><a href="contact.html" class="hover:text-bd-green">Contact</a></div>
+    </div>
+</footer>
+
+<script>if(localStorage.getItem('darkMode')==='true')document.documentElement.classList.add('dark')</script>
+</body>
+</html>

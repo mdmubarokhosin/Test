@@ -1,0 +1,50 @@
+<!-- 404.html - Not Found | ShighroPay -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 - Page Not Found | ShighroPay</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>S</text></svg>">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <script>tailwind.config={darkMode:'class',theme:{extend:{colors:{'bd-green':'#006A4E','bd-red':'#F42A41'}}}}</script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body{font-family:'Inter',sans-serif}
+        .float{animation:floatAnim 3s ease-in-out infinite}
+        @keyframes floatAnim{0%,100%{transform:translateY(0)}50%{transform:translateY(-15px)}}
+        .fade-in{animation:fadeIn .5s ease}
+        @keyframes fadeIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+    </style>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 min-h-screen flex flex-col">
+<header class="bg-white dark:bg-gray-800 shadow-sm">
+    <div class="max-w-4xl mx-auto px-4 py-3 flex items-center gap-3">
+        <a href="index.html" class="flex items-center gap-3">
+            <div class="w-9 h-9 bg-bd-green rounded-lg flex items-center justify-center text-white font-bold text-lg">S</div>
+            <h1 class="font-bold text-lg text-gray-800 dark:text-white">ShighroPay</h1>
+        </a>
+    </div>
+</header>
+
+<main class="flex-1 flex items-center justify-center p-6 fade-in">
+    <div class="text-center max-w-md">
+        <div class="float mb-8">
+            <div class="text-8xl font-bold text-bd-green/20">404</div>
+        </div>
+        <h2 class="text-3xl font-bold text-gray-800 dark:text-white mb-3">Page Not Found</h2>
+        <p class="text-gray-500 mb-8">The page you're looking for doesn't exist or has been moved.</p>
+        <div class="flex flex-col sm:flex-row gap-3 justify-center">
+            <a href="index.html" class="px-6 py-3 bg-bd-green text-white rounded-xl font-medium hover:bg-emerald-800 transition-colors flex items-center justify-center gap-2"><i class="bi bi-house-door"></i> Go Home</a>
+            <a href="dashboard.html" class="px-6 py-3 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-xl font-medium border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors flex items-center justify-center gap-2"><i class="bi bi-grid"></i> Dashboard</a>
+            <a href="contact.html" class="px-6 py-3 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-xl font-medium border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors flex items-center justify-center gap-2"><i class="bi bi-headset"></i> Contact</a>
+        </div>
+    </div>
+</main>
+
+<footer class="text-center py-4 text-xs text-gray-400">&copy; 2025 ShighroPay. All rights reserved.</footer>
+
+<script>if(localStorage.getItem('darkMode')==='true')document.documentElement.classList.add('dark')</script>
+</body>
+</html>

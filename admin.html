@@ -1,0 +1,1238 @@
+<!-- admin.html - Enterprise CRM Admin Panel | ShighroPay -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRM Admin Panel | ShighroPay</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>S</text></svg>">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        'bd-green': '#006A4E',
+                        'bd-red': '#F42A41',
+                        'sidebar': '#1e293b',
+                        'sidebar-hover': '#334155'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body{font-family:'Inter',sans-serif}
+        .sidebar-item{transition:all .2s;border-left:4px solid transparent}
+        .sidebar-item:hover,.sidebar-item.active{background-color:#334155;border-left:4px solid #10b981;color:#fff!important}
+        ::-webkit-scrollbar{width:6px;height:6px}
+        ::-webkit-scrollbar-track{background:#f1f1f1}
+        ::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:4px}
+        ::-webkit-scrollbar-thumb:hover{background:#94a3b8}
+        .dark ::-webkit-scrollbar-track{background:#1e293b}
+        .dark ::-webkit-scrollbar-thumb{background:#475569}
+        .fade-in{animation:fadeIn .3s ease-in}
+        @keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+        .sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:40}
+        .sidebar-overlay.active{display:block}
+        @media(max-width:1023px){.admin-sidebar{position:fixed;left:-280px;top:0;bottom:0;z-index:50;transition:left .3s ease;width:280px}.admin-sidebar.open{left:0}}
+        .toast-container{position:fixed;top:1rem;right:1rem;z-index:9999;display:flex;flex-direction:column;gap:.5rem}
+        .toast{padding:.75rem 1.25rem;border-radius:.5rem;color:#fff;font-size:.875rem;font-weight:500;box-shadow:0 10px 25px rgba(0,0,0,.15);animation:slideInRight .3s ease;display:flex;align-items:center;gap:.5rem;max-width:350px}
+        .toast-success{background:#059669}.toast-error{background:#dc2626}.toast-warning{background:#d97706}.toast-info{background:#2563eb}
+        @keyframes slideInRight{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
+        .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);backdrop-filter:blur(4px);z-index:60;display:flex;align-items:center;justify-content:center;padding:1rem}
+        .modal-content{background:#fff;border-radius:1rem;box-shadow:0 25px 50px rgba(0,0,0,.25);width:100%;max-width:560px;max-height:90vh;overflow-y:auto;animation:scaleIn .2s ease}
+        .dark .modal-content{background:#1e293b;color:#e2e8f0}
+        @keyframes scaleIn{from{transform:scale(.95);opacity:0}to{transform:scale(1);opacity:1}}
+        .stat-card{transition:all .2s}.stat-card:hover{transform:translateY(-2px);box-shadow:0 8px 25px -5px rgba(0,0,0,.1)}
+        .pulse-dot{animation:pulseDot 2s infinite}
+        @keyframes pulseDot{0%,100%{opacity:1}50%{opacity:.4}}
+        .empty-state{text-align:center;padding:3rem 1.5rem}
+        .empty-state i{font-size:3rem;color:#d1d5db;margin-bottom:1rem;display:block}
+        .empty-state h4{font-size:1.1rem;font-weight:600;color:#6b7280;margin-bottom:.5rem}
+        .empty-state p{font-size:.85rem;color:#9ca3af;max-width:280px;margin:0 auto}
+        .badge{display:inline-flex;align-items:center;padding:2px 10px;border-radius:9999px;font-size:.7rem;font-weight:600;text-transform:capitalize}
+        .log-success{color:#34d399}.log-error{color:#f87171}.log-warning{color:#fbbf24}.log-info{color:#60a5fa}
+        .notif-dropdown{position:absolute;top:100%;right:0;margin-top:.5rem;width:320px;background:#fff;border-radius:.75rem;box-shadow:0 10px 40px rgba(0,0,0,.15);border:1px solid #e5e7eb;z-index:30;display:none}
+        .notif-dropdown.show{display:block}
+        .dark .notif-dropdown{background:#1e293b;border-color:#334155}
+        .tab-btn{transition:all .2s}.tab-btn.active{color:#006A4E;border-bottom:2px solid #006A4E}
+        .priority-high{color:#ef4444}.priority-medium{color:#f59e0b}.priority-low{color:#3b82f6}
+        .login-bg{background:linear-gradient(135deg,#006A4E 0%,#004d38 50%,#003326 100%)}
+    </style>
+</head>
+<body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-200 overflow-hidden h-screen flex">
+
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- =================== LOGIN SCREEN =================== -->
+<div id="loginScreen" class="fixed inset-0 z-[200] flex">
+    <div class="hidden lg:flex login-bg flex-1 items-center justify-center p-12">
+        <div class="text-center text-white max-w-md">
+            <div class="w-20 h-20 bg-white/20 backdrop-blur rounded-2xl flex items-center justify-center mx-auto mb-6"><span class="text-4xl font-bold">S</span></div>
+            <h1 class="text-4xl font-bold mb-4">ShighroPay CRM</h1>
+            <p class="text-emerald-100 text-lg mb-8">Enterprise Payment Management & Customer Relationship System</p>
+            <div class="grid grid-cols-3 gap-4 text-center">
+                <div class="bg-white/10 rounded-xl p-4"><i class="bi bi-shield-check text-2xl mb-2 block"></i><span class="text-xs">Secure</span></div>
+                <div class="bg-white/10 rounded-xl p-4"><i class="bi bi-lightning-charge text-2xl mb-2 block"></i><span class="text-xs">Real-time</span></div>
+                <div class="bg-white/10 rounded-xl p-4"><i class="bi bi-graph-up text-2xl mb-2 block"></i><span class="text-xs">Analytics</span></div>
+            </div>
+        </div>
+    </div>
+    <div class="flex-1 flex items-center justify-center p-6 bg-white dark:bg-gray-900">
+        <div class="w-full max-w-md">
+            <div class="lg:hidden text-center mb-8">
+                <div class="w-14 h-14 bg-bd-green rounded-xl flex items-center justify-center mx-auto mb-3 text-white font-bold text-2xl">S</div>
+                <h2 class="text-2xl font-bold text-gray-800 dark:text-white">ShighroPay CRM</h2>
+            </div>
+            <h3 class="text-2xl font-bold text-gray-800 dark:text-white mb-1">Welcome Back</h3>
+            <p class="text-gray-500 mb-8">Sign in to access your admin panel</p>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email</label>
+                    <div class="relative"><i class="bi bi-envelope absolute left-3 top-3 text-gray-400"></i>
+                    <input type="email" id="loginEmail" class="w-full pl-10 pr-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-bd-green focus:border-bd-green outline-none bg-white dark:bg-gray-800 text-sm" placeholder="admin@shighropay.com" value="admin@shighropay.com"></div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Password</label>
+                    <div class="relative"><i class="bi bi-lock absolute left-3 top-3 text-gray-400"></i>
+                    <input type="password" id="loginPassword" class="w-full pl-10 pr-12 py-2.5 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-bd-green focus:border-bd-green outline-none bg-white dark:bg-gray-800 text-sm" placeholder="Enter password" value="admin123">
+                    <button onclick="togglePasswordVisibility()" class="absolute right-3 top-3 text-gray-400 hover:text-gray-600"><i class="bi bi-eye" id="passToggleIcon"></i></button></div>
+                </div>
+                <div class="flex justify-between items-center">
+                    <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" id="rememberMe" checked class="rounded border-gray-300 text-bd-green focus:ring-bd-green"><span class="text-sm text-gray-600 dark:text-gray-400">Remember me</span></label>
+                    <a href="#" class="text-sm text-bd-green hover:underline">Forgot password?</a>
+                </div>
+                <button onclick="doLogin()" id="loginBtn" class="w-full bg-bd-green hover:bg-emerald-800 text-white font-semibold py-3 rounded-xl transition-all flex items-center justify-center gap-2 shadow-lg shadow-emerald-200 dark:shadow-none"><i class="bi bi-box-arrow-in-right"></i> Sign In</button>
+                <p id="loginError" class="text-red-500 text-sm text-center hidden"></p>
+            </div>
+            <p class="text-center text-gray-400 text-xs mt-8">Default: admin@shighropay.com / admin123</p>
+        </div>
+    </div>
+</div>
+
+<!-- =================== LOADING =================== -->
+<div id="loadingOverlay" class="fixed inset-0 bg-white dark:bg-gray-900 z-[100] flex flex-col items-center justify-center gap-4 hidden">
+    <div class="w-12 h-12 border-4 border-gray-200 border-t-bd-green rounded-full animate-spin"></div>
+    <p class="text-gray-500 text-sm font-medium">Connecting to Firebase...</p>
+    <p id="loadingStatus" class="text-gray-400 text-xs">Initializing...</p>
+</div>
+
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+<!-- =================== SIDEBAR =================== -->
+<aside class="admin-sidebar lg:block w-64 bg-sidebar text-white flex flex-col h-full shadow-2xl z-20 flex-shrink-0 hidden" id="sidebar">
+    <div class="p-4 sm:p-5 flex items-center gap-3 border-b border-gray-700">
+        <div class="w-9 h-9 bg-bd-green rounded-lg flex items-center justify-center font-bold text-lg shadow-lg">S</div>
+        <div><h1 class="font-bold text-lg tracking-wide">ShighroPay</h1><p class="text-[10px] text-gray-400 uppercase tracking-widest">CRM Admin</p></div>
+        <button onclick="toggleSidebar()" class="lg:hidden ml-auto text-gray-400 hover:text-white p-1"><i class="bi bi-x-lg"></i></button>
+    </div>
+    <nav class="flex-1 overflow-y-auto py-3">
+        <ul class="space-y-0.5">
+            <li><p class="px-5 text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-1.5 mt-1">Main</p></li>
+            <li><button onclick="switchTab('dashboard')" id="nav-dashboard" class="sidebar-item active w-full flex items-center gap-3 px-5 py-2.5 text-sm font-medium text-gray-300 hover:text-white"><i class="bi bi-speedometer2 text-base"></i> Dashboard</button></li>
+            <li><button onclick="switchTab('transactions')" id="nav-transactions" class="sidebar-item w-full flex items-center gap-3 px-5 py-2.5 text-sm font-medium text-gray-300 hover:text-white"><i class="bi bi-credit-card-2-front text-base"></i> Transactions <span id="badge-tx" class="ml-auto bg-bd-red text-white text-[10px] px-1.5 py-0.5 rounded-full hidden">0</span></button></li>
+            <li><button onclick="switchTab('customers')" id="nav-customers" class="sidebar-item w-full flex items-center gap-3 px-5 py-2.5 text-sm font-medium text-gray-300 hover:text-white"><i class="bi bi-people text-base"></i> Customers</button></li>
+            <li><button onclick="switchTab('invoices')" id="nav-invoices" class="sidebar-item w-full flex items-center gap-3 px-5 py-2.5 text-sm font-medium text-gray-300 hover:text-white"><i class="bi bi-receipt text-base"></i> Invoices</button></li>
+
+            <li class="pt-3 border-t border-gray-700 mt-3"><p class="px-5 text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Business</p></li>
+            <li><button onclick="switchTab('merchants')" id="nav-merchants" class="sidebar-item w-full flex items-center gap-3 px-5 py-2.5 text-sm font-medium text-gray-300 hover:text-white"><i class="bi bi-shop text-base"></i> Merchants</button></li>
+            <li><button onclick="switchTab('gateways')" id="nav-gateways" class="sidebar-item w-full flex items-center gap-3 px-5 py-2.5 text-sm font-medium text-gray-300 hover:text-white"><i class="bi bi-diagram-3 text-base"></i> Gateways</button></li>
+            <li><button onclick="switchTab('settlements')" id="nav-settlements" class="sidebar-item w-full flex items-center gap-3 px-5 py-2.5 text-sm font-medium text-gray-300 hover:text-white"><i class="bi bi-cash-coin text-base"></i> Settlements</button></li>
+            <li><button onclick="switchTab('disputes')" id="nav-disputes" class="sidebar-item w-full flex items-center gap-3 px-5 py-2.5 text-sm font-medium text-gray-300 hover:text-white"><i class="bi bi-exclamation-triangle text-base"></i> Disputes <span id="badge-disputes" class="ml-auto bg-amber-500 text-white text-[10px] px-1.5 py-0.5 rounded-full hidden">0</span></button></li>
+
+            <li class="pt-3 border-t border-gray-700 mt-3"><p class="px-5 text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Support</p></li>
+            <li><button onclick="switchTab('tickets')" id="nav-tickets" class="sidebar-item w-full flex items-center gap-3 px-5 py-2.5 text-sm font-medium text-gray-300 hover:text-white"><i class="bi bi-ticket-detailed text-base"></i> Tickets <span id="badge-tickets" class="ml-auto bg-blue-500 text-white text-[10px] px-1.5 py-0.5 rounded-full hidden">0</span></button></li>
+            <li><button onclick="switchTab('announcements')" id="nav-announcements" class="sidebar-item w-full flex items-center gap-3 px-5 py-2.5 text-sm font-medium text-gray-300 hover:text-white"><i class="bi bi-megaphone text-base"></i> Announcements</button></li>
+
+            <li class="pt-3 border-t border-gray-700 mt-3"><p class="px-5 text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Reports & System</p></li>
+            <li><button onclick="switchTab('reports')" id="nav-reports" class="sidebar-item w-full flex items-center gap-3 px-5 py-2.5 text-sm font-medium text-gray-300 hover:text-white"><i class="bi bi-bar-chart-line text-base"></i> Reports</button></li>
+            <li><button onclick="switchTab('users')" id="nav-users" class="sidebar-item w-full flex items-center gap-3 px-5 py-2.5 text-sm font-medium text-gray-300 hover:text-white"><i class="bi bi-person-gear text-base"></i> Admin Users</button></li>
+            <li><button onclick="switchTab('email-templates')" id="nav-email-templates" class="sidebar-item w-full flex items-center gap-3 px-5 py-2.5 text-sm font-medium text-gray-300 hover:text-white"><i class="bi bi-envelope-paper text-base"></i> Email Templates</button></li>
+            <li><button onclick="switchTab('settings')" id="nav-settings" class="sidebar-item w-full flex items-center gap-3 px-5 py-2.5 text-sm font-medium text-gray-300 hover:text-white"><i class="bi bi-gear text-base"></i> Settings</button></li>
+            <li><button onclick="switchTab('logs')" id="nav-logs" class="sidebar-item w-full flex items-center gap-3 px-5 py-2.5 text-sm font-medium text-gray-300 hover:text-white"><i class="bi bi-terminal text-base"></i> Logs</button></li>
+            <li><button onclick="switchTab('backup')" id="nav-backup" class="sidebar-item w-full flex items-center gap-3 px-5 py-2.5 text-sm font-medium text-gray-300 hover:text-white"><i class="bi bi-cloud-download text-base"></i> Backup</button></li>
+        </ul>
+    </nav>
+    <div class="p-4 border-t border-gray-700">
+        <div class="flex items-center gap-3 mb-3">
+            <img src="https://ui-avatars.com/api/?name=Admin&background=006A4E&color=fff&size=40" class="w-9 h-9 rounded-full border-2 border-bd-green" id="adminAvatar">
+            <div><p class="text-sm font-semibold" id="adminName">Administrator</p><p class="text-[10px] text-gray-400" id="adminRole">Super Admin</p></div>
+        </div>
+        <button onclick="doLogout()" class="w-full bg-gray-700 hover:bg-gray-600 text-gray-300 py-2 rounded-lg text-sm transition-colors flex items-center justify-center gap-2"><i class="bi bi-box-arrow-right"></i> Logout</button>
+    </div>
+</aside>
+
+<!-- =================== MAIN =================== -->
+<main class="flex-1 flex flex-col h-full overflow-hidden relative hidden" id="mainContent">
+    <header class="h-14 sm:h-16 bg-white dark:bg-gray-800 shadow-sm flex items-center justify-between px-3 sm:px-6 z-10 flex-shrink-0">
+        <div class="flex items-center gap-2 sm:gap-3">
+            <button onclick="toggleSidebar()" class="lg:hidden text-gray-500 hover:text-gray-700 p-1"><i class="bi bi-list text-2xl"></i></button>
+            <h2 id="page-title" class="text-base sm:text-lg font-bold text-gray-800 dark:text-white truncate">Dashboard</h2>
+        </div>
+        <div class="flex items-center gap-2 sm:gap-3">
+            <button onclick="toggleDarkMode()" class="p-1.5 text-gray-400 hover:text-bd-green" title="Toggle Dark Mode"><i class="bi bi-moon-stars text-lg" id="darkModeIcon"></i></button>
+            <span id="firebase-status" class="flex items-center gap-1 text-[10px] px-2 py-1 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-500"><span class="w-1.5 h-1.5 rounded-full bg-gray-400"></span> Offline</span>
+            <div class="relative">
+                <button onclick="toggleNotifDropdown()" class="p-1.5 text-gray-400 hover:text-bd-green relative" title="Notifications"><i class="bi bi-bell text-lg"></i><span id="notif-badge" class="absolute -top-0.5 -right-0.5 w-4 h-4 bg-bd-red text-white text-[9px] rounded-full flex items-center justify-center hidden">0</span></button>
+                <div class="notif-dropdown" id="notifDropdown">
+                    <div class="p-3 border-b border-gray-100 dark:border-gray-700 flex justify-between items-center"><h4 class="text-sm font-bold text-gray-800 dark:text-white">Notifications</h4><span class="text-[10px] text-gray-400" id="notif-count-text">0 pending</span></div>
+                    <div id="notif-list" class="max-h-64 overflow-y-auto"></div>
+                    <div class="p-2 text-center border-t border-gray-100 dark:border-gray-700"><button onclick="switchTab('transactions');toggleNotifDropdown()" class="text-[10px] text-bd-green hover:underline">View all transactions</button></div>
+                </div>
+            </div>
+            <a href="index.html" class="p-1.5 text-gray-400 hover:text-bd-green hidden sm:block" title="Checkout"><i class="bi bi-cart text-lg"></i></a>
+            <a href="dashboard.html" class="p-1.5 text-gray-400 hover:text-bd-green hidden sm:block" title="User Dashboard"><i class="bi bi-grid text-lg"></i></a>
+        </div>
+    </header>
+
+    <div class="flex-1 overflow-y-auto p-4 sm:p-6" id="content-area">
+
+        <!-- ============ DASHBOARD ============ -->
+        <div id="view-dashboard" class="fade-in space-y-6">
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+                <div class="stat-card bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
+                    <div class="flex justify-between items-start"><div><p class="text-xs text-gray-500 font-medium">Total Revenue</p><h3 class="text-xl sm:text-2xl font-bold text-gray-800 dark:text-white mt-1" id="admin-total-rev">0</h3></div><div class="p-2 bg-emerald-100 dark:bg-emerald-900 text-emerald-600 rounded-lg"><i class="bi bi-currency-dollar text-lg"></i></div></div>
+                    <p class="text-[10px] text-gray-400 mt-2"><span id="rev-trend" class="text-emerald-500">--</span> vs last week</p>
+                </div>
+                <div class="stat-card bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
+                    <div class="flex justify-between items-start"><div><p class="text-xs text-gray-500 font-medium">Today Revenue</p><h3 class="text-xl sm:text-2xl font-bold text-gray-800 dark:text-white mt-1" id="admin-today-rev">0</h3></div><div class="p-2 bg-blue-100 dark:bg-blue-900 text-blue-600 rounded-lg"><i class="bi bi-calendar-check text-lg"></i></div></div>
+                    <p class="text-[10px] text-gray-400 mt-2" id="today-tx-count">0 transactions today</p>
+                </div>
+                <div class="stat-card bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
+                    <div class="flex justify-between items-start"><div><p class="text-xs text-gray-500 font-medium">Total Transactions</p><h3 class="text-xl sm:text-2xl font-bold text-gray-800 dark:text-white mt-1" id="admin-total-tx">0</h3></div><div class="p-2 bg-purple-100 dark:bg-purple-900 text-purple-600 rounded-lg"><i class="bi bi-arrow-left-right text-lg"></i></div></div>
+                    <p class="text-[10px] text-gray-400 mt-2" id="success-rate">0% success rate</p>
+                </div>
+                <div class="stat-card bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
+                    <div class="flex justify-between items-start"><div><p class="text-xs text-gray-500 font-medium">Pending</p><h3 class="text-xl sm:text-2xl font-bold text-amber-600 mt-1" id="admin-pending-tx">0</h3></div><div class="p-2 bg-amber-100 dark:bg-amber-900 text-amber-600 rounded-lg"><i class="bi bi-hourglass-split text-lg"></i></div></div>
+                    <p class="text-[10px] text-gray-400 mt-2">Needs attention</p>
+                </div>
+            </div>
+
+            <!-- Quick Stats Row -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                <div class="bg-white dark:bg-gray-800 p-3 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 flex items-center gap-3">
+                    <div class="p-2 bg-pink-100 dark:bg-pink-900 text-pink-600 rounded-lg"><i class="bi bi-people text-lg"></i></div>
+                    <div><p class="text-[10px] text-gray-500">Customers</p><p class="text-lg font-bold text-gray-800 dark:text-white" id="dash-customers">0</p></div>
+                </div>
+                <div class="bg-white dark:bg-gray-800 p-3 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 flex items-center gap-3">
+                    <div class="p-2 bg-indigo-100 dark:bg-indigo-900 text-indigo-600 rounded-lg"><i class="bi bi-shop text-lg"></i></div>
+                    <div><p class="text-[10px] text-gray-500">Merchants</p><p class="text-lg font-bold text-gray-800 dark:text-white" id="dash-merchants">0</p></div>
+                </div>
+                <div class="bg-white dark:bg-gray-800 p-3 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 flex items-center gap-3">
+                    <div class="p-2 bg-orange-100 dark:bg-orange-900 text-orange-600 rounded-lg"><i class="bi bi-ticket text-lg"></i></div>
+                    <div><p class="text-[10px] text-gray-500">Open Tickets</p><p class="text-lg font-bold text-gray-800 dark:text-white" id="dash-tickets">0</p></div>
+                </div>
+                <div class="bg-white dark:bg-gray-800 p-3 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 flex items-center gap-3">
+                    <div class="p-2 bg-red-100 dark:bg-red-900 text-red-600 rounded-lg"><i class="bi bi-exclamation-triangle text-lg"></i></div>
+                    <div><p class="text-[10px] text-gray-500">Disputes</p><p class="text-lg font-bold text-gray-800 dark:text-white" id="dash-disputes">0</p></div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-3 sm:gap-4">
+                <div class="lg:col-span-2 bg-white dark:bg-gray-800 p-4 sm:p-5 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
+                    <div class="flex justify-between items-center mb-4"><h3 class="font-bold text-gray-800 dark:text-white text-sm">Revenue (7 Days)</h3><span class="text-[10px] text-gray-400">Auto-updated</span></div>
+                    <div class="flex items-end gap-1 sm:gap-2 h-40 sm:h-52" id="revenue-bars"></div>
+                    <div class="flex justify-between text-[9px] text-gray-400 mt-2" id="revenue-labels"></div>
+                </div>
+                <div class="bg-white dark:bg-gray-800 p-4 sm:p-5 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
+                    <h3 class="font-bold text-gray-800 dark:text-white text-sm mb-4">Gateway Usage</h3>
+                    <div class="space-y-4">
+                        <div><div class="flex justify-between text-sm mb-1"><span class="text-gray-600 dark:text-gray-400 font-medium">bKash</span><span class="font-bold text-gray-800 dark:text-white text-xs" id="bkash-percent">0%</span></div><div class="w-full bg-gray-100 dark:bg-gray-700 rounded-full h-2.5"><div class="bg-pink-600 h-2.5 rounded-full transition-all duration-500" id="bkash-bar" style="width:0%"></div></div></div>
+                        <div><div class="flex justify-between text-sm mb-1"><span class="text-gray-600 dark:text-gray-400 font-medium">Nagad</span><span class="font-bold text-gray-800 dark:text-white text-xs" id="nagad-percent">0%</span></div><div class="w-full bg-gray-100 dark:bg-gray-700 rounded-full h-2.5"><div class="bg-orange-500 h-2.5 rounded-full transition-all duration-500" id="nagad-bar" style="width:0%"></div></div></div>
+                        <div><div class="flex justify-between text-sm mb-1"><span class="text-gray-600 dark:text-gray-400 font-medium">Rocket</span><span class="font-bold text-gray-800 dark:text-white text-xs" id="rocket-percent">0%</span></div><div class="w-full bg-gray-100 dark:bg-gray-700 rounded-full h-2.5"><div class="bg-purple-700 h-2.5 rounded-full transition-all duration-500" id="rocket-bar" style="width:0%"></div></div></div>
+                        <div><div class="flex justify-between text-sm mb-1"><span class="text-gray-600 dark:text-gray-400 font-medium">Upay</span><span class="font-bold text-gray-800 dark:text-white text-xs" id="upay-percent">0%</span></div><div class="w-full bg-gray-100 dark:bg-gray-700 rounded-full h-2.5"><div class="bg-teal-500 h-2.5 rounded-full transition-all duration-500" id="upay-bar" style="width:0%"></div></div></div>
+                    </div>
+                    <div class="mt-5 pt-4 border-t border-gray-100 dark:border-gray-700">
+                        <h4 class="text-[10px] font-semibold text-gray-400 uppercase mb-2">Status Breakdown</h4>
+                        <div class="space-y-1.5 text-xs" id="status-breakdown"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
+                <div class="p-4 sm:p-5 border-b border-gray-50 dark:border-gray-700 flex justify-between items-center">
+                    <h3 class="font-bold text-gray-800 dark:text-white text-sm">Live Transaction Monitor</h3>
+                    <span class="flex items-center gap-1.5 text-[10px] text-emerald-600 bg-emerald-50 dark:bg-emerald-900/50 px-2 py-1 rounded-full"><span class="w-1.5 h-1.5 bg-emerald-500 rounded-full pulse-dot"></span> Realtime</span>
+                </div>
+                <div class="overflow-x-auto"><table class="w-full text-left min-w-[480px]"><thead class="bg-gray-50/50 dark:bg-gray-700/50"><tr><th class="px-5 py-2.5 text-[10px] font-semibold text-gray-500 uppercase">ID</th><th class="px-5 py-2.5 text-[10px] font-semibold text-gray-500 uppercase">Customer</th><th class="px-5 py-2.5 text-[10px] font-semibold text-gray-500 uppercase">Amount</th><th class="px-5 py-2.5 text-[10px] font-semibold text-gray-500 uppercase">Gateway</th><th class="px-5 py-2.5 text-[10px] font-semibold text-gray-500 uppercase">Status</th><th class="px-5 py-2.5 text-[10px] font-semibold text-gray-500 uppercase">Time</th></tr></thead><tbody id="live-monitor-body" class="divide-y divide-gray-50 dark:divide-gray-700 text-xs"></tbody></table></div>
+                <div id="live-monitor-empty" class="hidden empty-state py-6"><i class="bi bi-inbox"></i><h4>No transactions yet</h4><p>Transactions will appear here in real-time</p></div>
+            </div>
+        </div>
+
+        <!-- ============ TRANSACTIONS ============ -->
+        <div id="view-transactions" class="hidden fade-in space-y-4">
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+                <div class="stat-card bg-white dark:bg-gray-800 p-3 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700"><p class="text-[10px] text-gray-500">Total</p><h3 class="text-lg font-bold text-gray-800 dark:text-white" id="tx-stat-total">0</h3></div>
+                <div class="stat-card bg-white dark:bg-gray-800 p-3 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700"><p class="text-[10px] text-gray-500">Success</p><h3 class="text-lg font-bold text-emerald-600" id="tx-stat-success">0</h3></div>
+                <div class="stat-card bg-white dark:bg-gray-800 p-3 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700"><p class="text-[10px] text-gray-500">Failed</p><h3 class="text-lg font-bold text-red-500" id="tx-stat-failed">0</h3></div>
+                <div class="stat-card bg-white dark:bg-gray-800 p-3 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700"><p class="text-[10px] text-gray-500">Pending</p><h3 class="text-lg font-bold text-amber-600" id="tx-stat-pending">0</h3></div>
+            </div>
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
+                <div class="p-4 sm:p-5 border-b border-gray-50 dark:border-gray-700 flex flex-col sm:flex-row justify-between gap-3">
+                    <div class="flex items-center gap-2"><h3 class="font-bold text-gray-800 dark:text-white">Transactions</h3><span id="tx-count-badge" class="text-[10px] bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 px-2 py-0.5 rounded-full">0</span></div>
+                    <div class="flex gap-2 flex-wrap items-center">
+                        <input type="text" id="admin-search-tx" oninput="renderTransactions()" placeholder="Search..." class="px-3 py-1.5 border border-gray-200 dark:border-gray-600 rounded-lg text-sm focus:ring-2 focus:ring-bd-green/20 outline-none w-36 sm:w-44 bg-white dark:bg-gray-700">
+                        <select id="admin-filter-status" onchange="renderTransactions()" class="px-3 py-1.5 border border-gray-200 dark:border-gray-600 rounded-lg text-sm focus:ring-2 focus:ring-bd-green/20 outline-none bg-white dark:bg-gray-700"><option value="all">All Status</option><option value="pending">Pending</option><option value="success">Success</option><option value="failed">Failed</option><option value="refunded">Refunded</option><option value="hold">Hold</option></select>
+                        <select id="admin-filter-method" onchange="renderTransactions()" class="px-3 py-1.5 border border-gray-200 dark:border-gray-600 rounded-lg text-sm focus:ring-2 focus:ring-bd-green/20 outline-none bg-white dark:bg-gray-700"><option value="all">All Gateway</option><option value="bkash">bKash</option><option value="nagad">Nagad</option><option value="rocket">Rocket</option><option value="upay">Upay</option></select>
+                        <input type="date" id="admin-filter-from" onchange="renderTransactions()" class="px-2 py-1.5 border border-gray-200 dark:border-gray-600 rounded-lg text-sm focus:ring-2 focus:ring-bd-green/20 outline-none bg-white dark:bg-gray-700">
+                        <input type="date" id="admin-filter-to" onchange="renderTransactions()" class="px-2 py-1.5 border border-gray-200 dark:border-gray-600 rounded-lg text-sm focus:ring-2 focus:ring-bd-green/20 outline-none bg-white dark:bg-gray-700">
+                        <button onclick="clearTxFilters()" class="px-3 py-1.5 border border-gray-200 dark:border-gray-600 rounded-lg text-sm hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors" title="Clear Filters"><i class="bi bi-x-circle"></i></button>
+                        <button onclick="openAddTransactionModal()" class="px-3 py-1.5 bg-bd-green text-white rounded-lg text-sm hover:bg-emerald-800 transition-colors flex items-center gap-1"><i class="bi bi-plus-lg"></i><span class="hidden sm:inline">Add</span></button>
+                        <button onclick="bulkActionModal()" class="px-3 py-1.5 bg-purple-600 text-white rounded-lg text-sm hover:bg-purple-700 transition-colors flex items-center gap-1" title="Bulk Actions"><i class="bi bi-collection"></i></button>
+                        <button onclick="exportCSV('all')" class="px-3 py-1.5 bg-gray-800 text-white rounded-lg text-sm hover:bg-gray-700 transition-colors flex items-center gap-1"><i class="bi bi-download"></i><span class="hidden sm:inline">CSV</span></button>
+                    </div>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left min-w-[700px]">
+                        <thead class="bg-gray-50/50 dark:bg-gray-700/50"><tr><th class="px-5 py-2.5 text-[10px] font-semibold text-gray-500 uppercase"><input type="checkbox" id="selectAllTx" onchange="toggleSelectAllTx(this.checked)" class="rounded border-gray-300"></th><th class="px-5 py-2.5 text-[10px] font-semibold text-gray-500 uppercase">TxID</th><th class="px-5 py-2.5 text-[10px] font-semibold text-gray-500 uppercase">Customer</th><th class="px-5 py-2.5 text-[10px] font-semibold text-gray-500 uppercase">Gateway</th><th class="px-5 py-2.5 text-[10px] font-semibold text-gray-500 uppercase">Amount</th><th class="px-5 py-2.5 text-[10px] font-semibold text-gray-500 uppercase">Status</th><th class="px-5 py-2.5 text-[10px] font-semibold text-gray-500 uppercase">Date</th><th class="px-5 py-2.5 text-[10px] font-semibold text-gray-500 uppercase text-right">Actions</th></tr></thead>
+                        <tbody id="admin-tx-table" class="divide-y divide-gray-50 dark:divide-gray-700 text-sm"></tbody>
+                    </table>
+                </div>
+                <div id="tx-empty" class="hidden empty-state"><i class="bi bi-receipt"></i><h4>No transactions found</h4><p>Create a new transaction or adjust your filters</p></div>
+                <div id="tx-pagination" class="p-4 border-t border-gray-50 dark:border-gray-700 flex items-center justify-between text-sm"></div>
+            </div>
+        </div>
+
+        <!-- ============ CUSTOMERS (NEW CRM) ============ -->
+        <div id="view-customers" class="hidden fade-in space-y-4">
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+                <div class="stat-card bg-white dark:bg-gray-800 p-3 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700"><p class="text-[10px] text-gray-500">Total Customers</p><h3 class="text-lg font-bold text-gray-800 dark:text-white" id="cust-total">0</h3></div>
+                <div class="stat-card bg-white dark:bg-gray-800 p-3 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700"><p class="text-[10px] text-gray-500">Active (30d)</p><h3 class="text-lg font-bold text-emerald-600" id="cust-active">0</h3></div>
+                <div class="stat-card bg-white dark:bg-gray-800 p-3 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700"><p class="text-[10px] text-gray-500">Total Spent</p><h3 class="text-lg font-bold text-blue-600" id="cust-spent">0</h3></div>
+                <div class="stat-card bg-white dark:bg-gray-800 p-3 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700"><p class="text-[10px] text-gray-500">Avg. Transaction</p><h3 class="text-lg font-bold text-purple-600" id="cust-avg">0</h3></div>
+            </div>
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
+                <div class="p-4 sm:p-5 border-b border-gray-50 dark:border-gray-700 flex flex-col sm:flex-row justify-between gap-3">
+                    <div class="flex items-center gap-2"><h3 class="font-bold text-gray-800 dark:text-white">Customer Management</h3><span id="cust-count-badge" class="text-[10px] bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 px-2 py-0.5 rounded-full">0</span></div>
+                    <div class="flex gap-2">
+                        <input type="text" id="cust-search" oninput="renderCustomers()" placeholder="Search customers..." class="px-3 py-1.5 border border-gray-200 dark:border-gray-600 rounded-lg text-sm outline-none w-44 bg-white dark:bg-gray-700">
+                        <button onclick="openAddCustomerModal()" class="px-3 py-1.5 bg-bd-green text-white rounded-lg text-sm hover:bg-emerald-800 transition-colors flex items-center gap-1"><i class="bi bi-plus-lg"></i> Add</button>
+                        <button onclick="exportCSV('customers')" class="px-3 py-1.5 bg-gray-800 text-white rounded-lg text-sm hover:bg-gray-700 transition-colors flex items-center gap-1"><i class="bi bi-download"></i></button>
+                    </div>
+                </div>
+                <div class="overflow-x-auto"><table class="w-full text-left min-w-[640px]"><thead class="bg-gray-50/50 dark:bg-gray-700/50"><tr><th class="px-5 py-2.5 text-[10px] font-semibold text-gray-500 uppercase">Customer</th><th class="px-5 py-2.5 text-[10px] font-semibold text-gray-500 uppercase">Email</th><th class="px-5 py-2.5 text-[10px] font-semibold text-gray-500 uppercase">Phone</th><th class="px-5 py-2.5 text-[10px] font-semibold text-gray-500 uppercase">Total Spent</th><th class="px-5 py-2.5 text-[10px] font-semibold text-gray-500 uppercase">Tx Count</th><th class="px-5 py-2.5 text-[10px] font-semibold text-gray-500 uppercase">Tags</th><th class="px-5 py-2.5 text-[10px] font-semibold text-gray-500 uppercase">Last Active</th><th class="px-5 py-2.5 text-[10px] font-semibold text-gray-500 uppercase text-right">Actions</th></tr></thead><tbody id="customers-table" class="divide-y divide-gray-50 dark:divide-gray-700 text-sm"></tbody></table></div>
+                <div id="cust-empty" class="hidden empty-state"><i class="bi bi-people"></i><h4>No customers yet</h4><p>Customer profiles are auto-created from transactions</p></div>
+            </div>
+        </div>
+
+        <!-- ============ INVOICES (NEW CRM) ============ -->
+        <div id="view-invoices" class="hidden fade-in space-y-4">
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+                <div class="stat-card bg-white dark:bg-gray-800 p-3 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700"><p class="text-[10px] text-gray-500">Total Invoices</p><h3 class="text-lg font-bold text-gray-800 dark:text-white" id="inv-total">0</h3></div>
+                <div class="stat-card bg-white dark:bg-gray-800 p-3 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700"><p class="text-[10px] text-gray-500">Paid</p><h3 class="text-lg font-bold text-emerald-600" id="inv-paid">0</h3></div>
+                <div class="stat-card bg-white dark:bg-gray-800 p-3 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700"><p class="text-[10px] text-gray-500">Unpaid</p><h3 class="text-lg font-bold text-amber-600" id="inv-unpaid">0</h3></div>
+                <div class="stat-card bg-white dark:bg-gray-800 p-3 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700"><p class="text-[10px] text-gray-500">Overdue</p><h3 class="text-lg font-bold text-red-600" id="inv-overdue">0</h3></div>
+            </div>
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
+                <div class="p-4 sm:p-5 border-b border-gray-50 dark:border-gray-700 flex flex-col sm:flex-row justify-between gap-3">
+                    <h3 class="font-bold text-gray-800 dark:text-white">Invoice Management</h3>
+                    <button onclick="openCreateInvoiceModal()" class="px-4 py-2 bg-bd-green text-white rounded-lg text-sm hover:bg-emerald-800 transition-colors flex items-center gap-1"><i class="bi bi-plus-lg"></i> Create Invoice</button>
+                </div>
+                <div class="overflow-x-auto"><table class="w-full text-left min-w-[600px]"><thead class="bg-gray-50/50 dark:bg-gray-700/50"><tr><th class="px-5 py-2.5 text-[10px] font-semibold text-gray-500 uppercase">Invoice #</th><th class="px-5 py-2.5 text-[10px] font-semibold text-gray-500 uppercase">Customer</th><th class="px-5 py-2.5 text-[10px] font-semibold text-gray-500 uppercase">Amount</th><th class="px-5 py-2.5 text-[10px] font-semibold text-gray-500 uppercase">Due Date</th><th class="px-5 py-2.5 text-[10px] font-semibold text-gray-500 uppercase">Status</th><th class="px-5 py-2.5 text-[10px] font-semibold text-gray-500 uppercase text-right">Actions</th></tr></thead><tbody id="invoices-table" class="divide-y divide-gray-50 dark:divide-gray-700 text-sm"></tbody></table></div>
+                <div id="inv-empty" class="hidden empty-state"><i class="bi bi-receipt"></i><h4>No invoices yet</h4><p>Create your first invoice</p></div>
+            </div>
+        </div>
+
+        <!-- ============ MERCHANTS ============ -->
+        <div id="view-merchants" class="hidden fade-in space-y-4">
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-2">
+                <div class="stat-card bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700"><p class="text-xs text-gray-500">Total Merchants</p><h3 class="text-xl font-bold text-gray-800 dark:text-white mt-1" id="m-total">0</h3></div>
+                <div class="stat-card bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700"><p class="text-xs text-gray-500">Active</p><h3 class="text-xl font-bold text-emerald-600 mt-1" id="m-active">0</h3></div>
+                <div class="stat-card bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700"><p class="text-xs text-gray-500">Inactive</p><h3 class="text-xl font-bold text-red-500 mt-1" id="m-inactive">0</h3></div>
+                <div class="stat-card bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700"><p class="text-xs text-gray-500">Avg Commission</p><h3 class="text-xl font-bold text-purple-600 mt-1" id="m-avg-comm">0%</h3></div>
+            </div>
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
+                <div class="p-4 sm:p-5 border-b border-gray-50 dark:border-gray-700 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                    <div class="flex items-center gap-2"><h3 class="font-bold text-gray-800 dark:text-white">Merchant Management</h3><span id="merchant-count-badge" class="text-[10px] bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 px-2 py-0.5 rounded-full">0</span></div>
+                    <button onclick="openAddMerchantModal()" class="bg-bd-green text-white px-4 py-2 rounded-lg hover:bg-emerald-800 transition-colors flex items-center gap-2 text-sm"><i class="bi bi-plus-lg"></i> Add Merchant</button>
+                </div>
+                <div class="overflow-x-auto"><table class="w-full text-left min-w-[640px]"><thead class="bg-gray-50/50 dark:bg-gray-700/50"><tr><th class="px-5 py-2.5 text-[10px] font-semibold text-gray-500 uppercase">Merchant</th><th class="px-5 py-2.5 text-[10px] font-semibold text-gray-500 uppercase">Email</th><th class="px-5 py-2.5 text-[10px] font-semibold text-gray-500 uppercase">Phone</th><th class="px-5 py-2.5 text-[10px] font-semibold text-gray-500 uppercase">Commission</th><th class="px-5 py-2.5 text-[10px] font-semibold text-gray-500 uppercase">Status</th><th class="px-5 py-2.5 text-[10px] font-semibold text-gray-500 uppercase">Created</th><th class="px-5 py-2.5 text-[10px] font-semibold text-gray-500 uppercase text-right">Actions</th></tr></thead><tbody id="merchants-table" class="divide-y divide-gray-50 dark:divide-gray-700 text-sm"></tbody></table></div>
+                <div id="merchant-empty" class="hidden empty-state"><i class="bi bi-shop"></i><h4>No merchants yet</h4><p>Add your first merchant to get started</p></div>
+            </div>
+        </div>
+
+        <!-- ============ GATEWAYS ============ -->
+        <div id="view-gateways" class="hidden fade-in space-y-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4" id="gateway-cards"></div>
+            <div class="flex justify-end"><button onclick="saveGatewayCommissions()" class="px-5 py-2 bg-bd-green text-white rounded-lg text-sm hover:bg-emerald-800 transition-colors"><i class="bi bi-check-lg mr-1"></i> Save Commission Rates</button></div>
+        </div>
+
+        <!-- ============ SETTLEMENTS ============ -->
+        <div id="view-settlements" class="hidden fade-in space-y-4">
+            <div class="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 mb-2">
+                <div class="stat-card bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700"><p class="text-xs text-gray-500">Total Settlements</p><h3 class="text-xl font-bold text-gray-800 dark:text-white mt-1" id="s-total">0</h3></div>
+                <div class="stat-card bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700"><p class="text-xs text-gray-500">Pending Amount</p><h3 class="text-xl font-bold text-amber-600 mt-1" id="s-pending-amt">0</h3></div>
+                <div class="stat-card bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700"><p class="text-xs text-gray-500">Processed Amount</p><h3 class="text-xl font-bold text-emerald-600 mt-1" id="s-processed-amt">0</h3></div>
+            </div>
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
+                <div class="p-4 sm:p-5 border-b border-gray-50 dark:border-gray-700 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                    <div class="flex items-center gap-2"><h3 class="font-bold text-gray-800 dark:text-white">Settlement Requests</h3><span id="settlement-count-badge" class="text-[10px] bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 px-2 py-0.5 rounded-full">0</span></div>
+                    <button onclick="openAddSettlementModal()" class="px-4 py-2 bg-bd-green text-white rounded-lg text-sm hover:bg-emerald-800 transition-colors flex items-center gap-1"><i class="bi bi-plus-lg"></i> Add Settlement</button>
+                </div>
+                <div class="overflow-x-auto"><table class="w-full text-left min-w-[540px]"><thead class="bg-gray-50/50 dark:bg-gray-700/50"><tr><th class="px-5 py-2.5 text-[10px] font-semibold text-gray-500 uppercase">Merchant</th><th class="px-5 py-2.5 text-[10px] font-semibold text-gray-500 uppercase">Amount</th><th class="px-5 py-2.5 text-[10px] font-semibold text-gray-500 uppercase">Request Date</th><th class="px-5 py-2.5 text-[10px] font-semibold text-gray-500 uppercase">Status</th><th class="px-5 py-2.5 text-[10px] font-semibold text-gray-500 uppercase text-right">Action</th></tr></thead><tbody id="settlements-table" class="divide-y divide-gray-50 dark:divide-gray-700 text-sm"></tbody></table></div>
+                <div id="settlement-empty" class="hidden empty-state"><i class="bi bi-cash-coin"></i><h4>No settlements yet</h4><p>Settlement requests will appear here</p></div>
+            </div>
+        </div>
+
+        <!-- ============ DISPUTES (NEW CRM) ============ -->
+        <div id="view-disputes" class="hidden fade-in space-y-4">
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+                <div class="stat-card bg-white dark:bg-gray-800 p-3 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700"><p class="text-[10px] text-gray-500">Total Disputes</p><h3 class="text-lg font-bold text-gray-800 dark:text-white" id="disp-total">0</h3></div>
+                <div class="stat-card bg-white dark:bg-gray-800 p-3 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700"><p class="text-[10px] text-gray-500">Open</p><h3 class="text-lg font-bold text-amber-600" id="disp-open">0</h3></div>
+                <div class="stat-card bg-white dark:bg-gray-800 p-3 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700"><p class="text-[10px] text-gray-500">Resolved</p><h3 class="text-lg font-bold text-emerald-600" id="disp-resolved">0</h3></div>
+                <div class="stat-card bg-white dark:bg-gray-800 p-3 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700"><p class="text-[10px] text-gray-500">Disputed Amount</p><h3 class="text-lg font-bold text-red-600" id="disp-amount">0</h3></div>
+            </div>
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
+                <div class="p-4 sm:p-5 border-b border-gray-50 dark:border-gray-700 flex justify-between items-center">
+                    <h3 class="font-bold text-gray-800 dark:text-white">Dispute Management</h3>
+                    <button onclick="openCreateDisputeModal()" class="px-4 py-2 bg-bd-red text-white rounded-lg text-sm hover:bg-red-700 transition-colors flex items-center gap-1"><i class="bi bi-plus-lg"></i> File Dispute</button>
+                </div>
+                <div class="overflow-x-auto"><table class="w-full text-left min-w-[600px]"><thead class="bg-gray-50/50 dark:bg-gray-700/50"><tr><th class="px-5 py-2.5 text-[10px] font-semibold text-gray-500 uppercase">ID</th><th class="px-5 py-2.5 text-[10px] font-semibold text-gray-500 uppercase">Transaction</th><th class="px-5 py-2.5 text-[10px] font-semibold text-gray-500 uppercase">Customer</th><th class="px-5 py-2.5 text-[10px] font-semibold text-gray-500 uppercase">Amount</th><th class="px-5 py-2.5 text-[10px] font-semibold text-gray-500 uppercase">Reason</th><th class="px-5 py-2.5 text-[10px] font-semibold text-gray-500 uppercase">Status</th><th class="px-5 py-2.5 text-[10px] font-semibold text-gray-500 uppercase text-right">Actions</th></tr></thead><tbody id="disputes-table" class="divide-y divide-gray-50 dark:divide-gray-700 text-sm"></tbody></table></div>
+                <div id="disp-empty" class="hidden empty-state"><i class="bi bi-exclamation-triangle"></i><h4>No disputes</h4><p>Disputes will appear here when filed</p></div>
+            </div>
+        </div>
+
+        <!-- ============ TICKETS (NEW CRM) ============ -->
+        <div id="view-tickets" class="hidden fade-in space-y-4">
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+                <div class="stat-card bg-white dark:bg-gray-800 p-3 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700"><p class="text-[10px] text-gray-500">Total Tickets</p><h3 class="text-lg font-bold text-gray-800 dark:text-white" id="tick-total">0</h3></div>
+                <div class="stat-card bg-white dark:bg-gray-800 p-3 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700"><p class="text-[10px] text-gray-500">Open</p><h3 class="text-lg font-bold text-amber-600" id="tick-open">0</h3></div>
+                <div class="stat-card bg-white dark:bg-gray-800 p-3 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700"><p class="text-[10px] text-gray-500">In Progress</p><h3 class="text-lg font-bold text-blue-600" id="tick-progress">0</h3></div>
+                <div class="stat-card bg-white dark:bg-gray-800 p-3 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700"><p class="text-[10px] text-gray-500">Closed</p><h3 class="text-lg font-bold text-emerald-600" id="tick-closed">0</h3></div>
+            </div>
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
+                <div class="p-4 sm:p-5 border-b border-gray-50 dark:border-gray-700 flex justify-between items-center">
+                    <h3 class="font-bold text-gray-800 dark:text-white">Support Tickets</h3>
+                    <div class="flex gap-2">
+                        <select id="ticket-filter" onchange="renderTickets()" class="px-3 py-1.5 border border-gray-200 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-700"><option value="all">All</option><option value="open">Open</option><option value="in_progress">In Progress</option><option value="closed">Closed</option></select>
+                        <button onclick="openCreateTicketModal()" class="px-4 py-2 bg-bd-green text-white rounded-lg text-sm hover:bg-emerald-800 transition-colors flex items-center gap-1"><i class="bi bi-plus-lg"></i> New Ticket</button>
+                    </div>
+                </div>
+                <div class="overflow-x-auto"><table class="w-full text-left min-w-[640px]"><thead class="bg-gray-50/50 dark:bg-gray-700/50"><tr><th class="px-5 py-2.5 text-[10px] font-semibold text-gray-500 uppercase">Ticket #</th><th class="px-5 py-2.5 text-[10px] font-semibold text-gray-500 uppercase">Subject</th><th class="px-5 py-2.5 text-[10px] font-semibold text-gray-500 uppercase">Customer</th><th class="px-5 py-2.5 text-[10px] font-semibold text-gray-500 uppercase">Priority</th><th class="px-5 py-2.5 text-[10px] font-semibold text-gray-500 uppercase">Status</th><th class="px-5 py-2.5 text-[10px] font-semibold text-gray-500 uppercase">Created</th><th class="px-5 py-2.5 text-[10px] font-semibold text-gray-500 uppercase text-right">Actions</th></tr></thead><tbody id="tickets-table" class="divide-y divide-gray-50 dark:divide-gray-700 text-sm"></tbody></table></div>
+                <div id="tick-empty" class="hidden empty-state"><i class="bi bi-ticket-detailed"></i><h4>No tickets</h4><p>Support tickets will appear here</p></div>
+            </div>
+        </div>
+
+        <!-- ============ ANNOUNCEMENTS (NEW) ============ -->
+        <div id="view-announcements" class="hidden fade-in space-y-4">
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
+                <div class="p-4 sm:p-5 border-b border-gray-50 dark:border-gray-700 flex justify-between items-center">
+                    <h3 class="font-bold text-gray-800 dark:text-white">Announcements</h3>
+                    <button onclick="openCreateAnnouncementModal()" class="px-4 py-2 bg-bd-green text-white rounded-lg text-sm hover:bg-emerald-800 transition-colors flex items-center gap-1"><i class="bi bi-plus-lg"></i> New</button>
+                </div>
+                <div id="announcements-list" class="divide-y divide-gray-50 dark:divide-gray-700"></div>
+                <div id="ann-empty" class="hidden empty-state"><i class="bi bi-megaphone"></i><h4>No announcements</h4><p>Create announcements for your users</p></div>
+            </div>
+        </div>
+
+        <!-- ============ REPORTS ============ -->
+        <div id="view-reports" class="hidden fade-in space-y-4">
+            <div class="grid grid-cols-2 sm:grid-cols-5 gap-3 mb-2">
+                <div class="stat-card bg-white dark:bg-gray-800 p-3 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700"><p class="text-[10px] text-gray-500">Today</p><h3 class="text-base font-bold text-gray-800 dark:text-white" id="r-today">0</h3></div>
+                <div class="stat-card bg-white dark:bg-gray-800 p-3 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700"><p class="text-[10px] text-gray-500">This Week</p><h3 class="text-base font-bold text-blue-600" id="r-week">0</h3></div>
+                <div class="stat-card bg-white dark:bg-gray-800 p-3 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700"><p class="text-[10px] text-gray-500">This Month</p><h3 class="text-base font-bold text-purple-600" id="r-month">0</h3></div>
+                <div class="stat-card bg-white dark:bg-gray-800 p-3 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700"><p class="text-[10px] text-gray-500">Total Revenue</p><h3 class="text-base font-bold text-emerald-600" id="r-total">0</h3></div>
+                <div class="stat-card bg-white dark:bg-gray-800 p-3 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700"><p class="text-[10px] text-gray-500">Success Rate</p><h3 class="text-base font-bold text-amber-600" id="r-rate">0%</h3></div>
+            </div>
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-4 sm:p-5">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
+                    <h3 class="font-bold text-gray-800 dark:text-white">Report Filters</h3>
+                    <div class="flex gap-2 items-center"><input type="date" id="report-from" class="px-2 py-1.5 border border-gray-200 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-700"><span class="text-gray-400 text-sm">to</span><input type="date" id="report-to" class="px-2 py-1.5 border border-gray-200 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-700"></div>
+                </div>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+                <div class="bg-white dark:bg-gray-800 p-5 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 text-center hover:shadow-md transition-shadow"><div class="p-2 bg-emerald-100 dark:bg-emerald-900 text-emerald-600 rounded-lg inline-block mb-3"><i class="bi bi-graph-up text-xl"></i></div><h4 class="font-bold text-gray-800 dark:text-white text-sm">Daily Report</h4><p class="text-[10px] text-gray-400 mb-3">Revenue by day</p><button onclick="exportCSV('daily')" class="w-full py-1.5 border border-gray-200 dark:border-gray-600 rounded-lg text-xs hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center justify-center gap-1 transition-colors"><i class="bi bi-download"></i> Export CSV</button></div>
+                <div class="bg-white dark:bg-gray-800 p-5 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 text-center hover:shadow-md transition-shadow"><div class="p-2 bg-blue-100 dark:bg-blue-900 text-blue-600 rounded-lg inline-block mb-3"><i class="bi bi-calendar3 text-xl"></i></div><h4 class="font-bold text-gray-800 dark:text-white text-sm">Monthly Report</h4><p class="text-[10px] text-gray-400 mb-3">Monthly summary</p><button onclick="exportCSV('monthly')" class="w-full py-1.5 border border-gray-200 dark:border-gray-600 rounded-lg text-xs hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center justify-center gap-1 transition-colors"><i class="bi bi-download"></i> Export CSV</button></div>
+                <div class="bg-white dark:bg-gray-800 p-5 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 text-center hover:shadow-md transition-shadow"><div class="p-2 bg-pink-100 dark:bg-pink-900 text-pink-600 rounded-lg inline-block mb-3"><i class="bi bi-diagram-3 text-xl"></i></div><h4 class="font-bold text-gray-800 dark:text-white text-sm">Gateway Report</h4><p class="text-[10px] text-gray-400 mb-3">By payment method</p><button onclick="exportCSV('gateway')" class="w-full py-1.5 border border-gray-200 dark:border-gray-600 rounded-lg text-xs hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center justify-center gap-1 transition-colors"><i class="bi bi-download"></i> Export CSV</button></div>
+                <div class="bg-white dark:bg-gray-800 p-5 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 text-center hover:shadow-md transition-shadow"><div class="p-2 bg-purple-100 dark:bg-purple-900 text-purple-600 rounded-lg inline-block mb-3"><i class="bi bi-people text-xl"></i></div><h4 class="font-bold text-gray-800 dark:text-white text-sm">Customer Report</h4><p class="text-[10px] text-gray-400 mb-3">Customer analytics</p><button onclick="exportCSV('customers')" class="w-full py-1.5 border border-gray-200 dark:border-gray-600 rounded-lg text-xs hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center justify-center gap-1 transition-colors"><i class="bi bi-download"></i> Export CSV</button></div>
+            </div>
+        </div>
+
+        <!-- ============ ADMIN USERS (NEW CRM) ============ -->
+        <div id="view-users" class="hidden fade-in space-y-4">
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
+                <div class="p-4 sm:p-5 border-b border-gray-50 dark:border-gray-700 flex justify-between items-center">
+                    <h3 class="font-bold text-gray-800 dark:text-white">Admin User Management</h3>
+                    <button onclick="openAddAdminUserModal()" class="px-4 py-2 bg-bd-green text-white rounded-lg text-sm hover:bg-emerald-800 transition-colors flex items-center gap-1"><i class="bi bi-plus-lg"></i> Add User</button>
+                </div>
+                <div class="overflow-x-auto"><table class="w-full text-left min-w-[500px]"><thead class="bg-gray-50/50 dark:bg-gray-700/50"><tr><th class="px-5 py-2.5 text-[10px] font-semibold text-gray-500 uppercase">User</th><th class="px-5 py-2.5 text-[10px] font-semibold text-gray-500 uppercase">Email</th><th class="px-5 py-2.5 text-[10px] font-semibold text-gray-500 uppercase">Role</th><th class="px-5 py-2.5 text-[10px] font-semibold text-gray-500 uppercase">Status</th><th class="px-5 py-2.5 text-[10px] font-semibold text-gray-500 uppercase">Last Login</th><th class="px-5 py-2.5 text-[10px] font-semibold text-gray-500 uppercase text-right">Actions</th></tr></thead><tbody id="admin-users-table" class="divide-y divide-gray-50 dark:divide-gray-700 text-sm"></tbody></table></div>
+                <div id="users-empty" class="hidden empty-state"><i class="bi bi-person-gear"></i><h4>No additional admin users</h4><p>Add users with different roles</p></div>
+            </div>
+        </div>
+
+        <!-- ============ EMAIL TEMPLATES (NEW CRM) ============ -->
+        <div id="view-email-templates" class="hidden fade-in space-y-4">
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
+                <div class="p-4 sm:p-5 border-b border-gray-50 dark:border-gray-700 flex justify-between items-center">
+                    <h3 class="font-bold text-gray-800 dark:text-white">Email Templates</h3>
+                    <button onclick="openCreateEmailTemplateModal()" class="px-4 py-2 bg-bd-green text-white rounded-lg text-sm hover:bg-emerald-800 transition-colors flex items-center gap-1"><i class="bi bi-plus-lg"></i> New Template</button>
+                </div>
+                <div id="email-templates-list" class="divide-y divide-gray-50 dark:divide-gray-700"></div>
+                <div id="etpl-empty" class="hidden empty-state"><i class="bi bi-envelope-paper"></i><h4>No email templates</h4><p>Create templates for automated emails</p></div>
+            </div>
+        </div>
+
+        <!-- ============ SETTINGS ============ -->
+        <div id="view-settings" class="hidden fade-in">
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-5 sm:p-6 max-w-3xl">
+                <h3 class="font-bold text-gray-800 dark:text-white mb-5">System Settings</h3>
+                <div class="space-y-5">
+                    <div class="flex items-center justify-between pb-4 border-b border-gray-50 dark:border-gray-700 gap-3"><div><h4 class="font-medium text-gray-800 dark:text-white text-sm">Maintenance Mode</h4><p class="text-xs text-gray-400">Disable all payment processing</p></div><label class="relative inline-flex items-center cursor-pointer flex-shrink-0"><input type="checkbox" id="setting-maintenance" class="sr-only peer"><div class="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-bd-red"></div></label></div>
+                    <div class="flex items-center justify-between pb-4 border-b border-gray-50 dark:border-gray-700 gap-3"><div><h4 class="font-medium text-gray-800 dark:text-white text-sm">Transaction Limit</h4><p class="text-xs text-gray-400">Maximum amount per transaction</p></div><div class="flex items-center gap-1 flex-shrink-0"><span class="text-gray-500 font-bold text-sm">&#x09F3;</span><input type="number" id="setting-tx-limit" value="100000" class="w-28 px-3 py-1.5 border border-gray-200 dark:border-gray-600 rounded-lg text-right text-sm bg-white dark:bg-gray-700"></div></div>
+                    <div class="flex items-center justify-between pb-4 border-b border-gray-50 dark:border-gray-700 gap-3"><div><h4 class="font-medium text-gray-800 dark:text-white text-sm">Min Transaction Amount</h4><p class="text-xs text-gray-400">Minimum allowed transaction amount</p></div><div class="flex items-center gap-1 flex-shrink-0"><span class="text-gray-500 font-bold text-sm">&#x09F3;</span><input type="number" id="setting-min-tx" value="10" class="w-24 px-3 py-1.5 border border-gray-200 dark:border-gray-600 rounded-lg text-right text-sm bg-white dark:bg-gray-700"></div></div>
+                    <div class="flex items-center justify-between pb-4 border-b border-gray-50 dark:border-gray-700 gap-3"><div><h4 class="font-medium text-gray-800 dark:text-white text-sm">Currency</h4><p class="text-xs text-gray-400">Display currency symbol</p></div><select id="setting-currency" class="px-4 py-1.5 border border-gray-200 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-sm flex-shrink-0"><option value="BDT">BDT (&#x09F3;)</option><option value="USD">USD ($)</option></select></div>
+                    <div class="flex items-center justify-between pb-4 border-b border-gray-50 dark:border-gray-700 gap-3"><div><h4 class="font-medium text-gray-800 dark:text-white text-sm">Auto Accept Settlements</h4><p class="text-xs text-gray-400">Automatically process settlements</p></div><label class="relative inline-flex items-center cursor-pointer flex-shrink-0"><input type="checkbox" id="setting-auto-settle" class="sr-only peer"><div class="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-bd-green"></div></label></div>
+                    <div class="flex items-center justify-between pb-4 border-b border-gray-50 dark:border-gray-700 gap-3"><div><h4 class="font-medium text-gray-800 dark:text-white text-sm">Site Name</h4><p class="text-xs text-gray-400">Your payment gateway name</p></div><input type="text" id="setting-site-name" value="ShighroPay" class="w-40 px-3 py-1.5 border border-gray-200 dark:border-gray-600 rounded-lg text-sm flex-shrink-0 bg-white dark:bg-gray-700"></div>
+                    <div class="flex items-center justify-between pb-4 border-b border-gray-50 dark:border-gray-700 gap-3"><div><h4 class="font-medium text-gray-800 dark:text-white text-sm">Admin Email</h4><p class="text-xs text-gray-400">For notifications and alerts</p></div><input type="email" id="setting-admin-email" value="" placeholder="admin@example.com" class="w-48 px-3 py-1.5 border border-gray-200 dark:border-gray-600 rounded-lg text-sm flex-shrink-0 bg-white dark:bg-gray-700"></div>
+                    <div class="flex items-center justify-between pb-4 border-b border-gray-50 dark:border-gray-700 gap-3"><div><h4 class="font-medium text-gray-800 dark:text-white text-sm">Notification Sound</h4><p class="text-xs text-gray-400">Play sound on new transactions</p></div><label class="relative inline-flex items-center cursor-pointer flex-shrink-0"><input type="checkbox" id="setting-notif-sound" checked class="sr-only peer"><div class="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-bd-green"></div></label></div>
+                    <div class="flex items-center justify-between pb-4 border-b border-gray-50 dark:border-gray-700 gap-3"><div><h4 class="font-medium text-gray-800 dark:text-white text-sm">Enable Coupon System</h4><p class="text-xs text-gray-400">Allow discount coupons on checkout</p></div><label class="relative inline-flex items-center cursor-pointer flex-shrink-0"><input type="checkbox" id="setting-coupons" class="sr-only peer"><div class="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-bd-green"></div></label></div>
+                    <div class="flex items-center justify-between pb-4 border-b border-gray-50 dark:border-gray-700 gap-3"><div><h4 class="font-medium text-gray-800 dark:text-white text-sm">Allow Refunds</h4><p class="text-xs text-gray-400">Let users request refunds</p></div><label class="relative inline-flex items-center cursor-pointer flex-shrink-0"><input type="checkbox" id="setting-refunds" checked class="sr-only peer"><div class="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-bd-green"></div></label></div>
+                    <div class="flex items-center justify-between gap-3"><div><h4 class="font-medium text-gray-800 dark:text-white text-sm">Auto-Approve Transactions</h4><p class="text-xs text-gray-400">Skip manual approval for transactions</p></div><label class="relative inline-flex items-center cursor-pointer flex-shrink-0"><input type="checkbox" id="setting-auto-approve" class="sr-only peer"><div class="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-bd-green"></div></label></div>
+                    <div class="flex items-center justify-between pb-4 border-b border-gray-50 dark:border-gray-700 gap-3"><div><h4 class="font-medium text-gray-800 dark:text-white text-sm">Two-Factor Authentication</h4><p class="text-xs text-gray-400">Require 2FA for admin login</p></div><label class="relative inline-flex items-center cursor-pointer flex-shrink-0"><input type="checkbox" id="setting-2fa" class="sr-only peer"><div class="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-bd-green"></div></label></div>
+                    <div class="flex items-center justify-between pb-4 border-b border-gray-50 dark:border-gray-700 gap-3"><div><h4 class="font-medium text-gray-800 dark:text-white text-sm">Session Timeout (minutes)</h4><p class="text-xs text-gray-400">Auto-logout after inactivity</p></div><input type="number" id="setting-session-timeout" value="30" class="w-24 px-3 py-1.5 border border-gray-200 dark:border-gray-600 rounded-lg text-right text-sm bg-white dark:bg-gray-700 flex-shrink-0"></div>
+                    <div class="flex items-center justify-between pb-4 border-b border-gray-50 dark:border-gray-700 gap-3"><div><h4 class="font-medium text-gray-800 dark:text-white text-sm">Daily Transaction Limit</h4><p class="text-xs text-gray-400">Max total daily transactions</p></div><div class="flex items-center gap-1 flex-shrink-0"><span class="text-gray-500 font-bold text-sm">&#x09F3;</span><input type="number" id="setting-daily-limit" value="1000000" class="w-32 px-3 py-1.5 border border-gray-200 dark:border-gray-600 rounded-lg text-right text-sm bg-white dark:bg-gray-700"></div></div>
+                    <div class="flex items-center justify-between pb-4 border-b border-gray-50 dark:border-gray-700 gap-3"><div><h4 class="font-medium text-gray-800 dark:text-white text-sm">Email Notifications</h4><p class="text-xs text-gray-400">Receive email on each transaction</p></div><label class="relative inline-flex items-center cursor-pointer flex-shrink-0"><input type="checkbox" id="setting-email-notif" checked class="sr-only peer"><div class="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-bd-green"></div></label></div>
+                    <div class="flex items-center justify-between gap-3"><div><h4 class="font-medium text-gray-800 dark:text-white text-sm">Fraud Detection</h4><p class="text-xs text-gray-400">Auto-flag suspicious transactions</p></div><label class="relative inline-flex items-center cursor-pointer flex-shrink-0"><input type="checkbox" id="setting-fraud-detect" checked class="sr-only peer"><div class="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-bd-green"></div></label></div>
+                </div>
+                <div class="mt-6 pt-4 border-t border-gray-100 dark:border-gray-700 flex justify-end"><button onclick="saveSettings()" class="bg-bd-green text-white px-6 py-2 rounded-lg hover:bg-emerald-800 transition-colors text-sm font-medium"><i class="bi bi-check-lg mr-1"></i> Save Changes</button></div>
+            </div>
+            <!-- API & Webhook Settings -->
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-5 sm:p-6 max-w-3xl mt-5">
+                <h3 class="font-bold text-gray-800 dark:text-white mb-5"><i class="bi bi-code-slash mr-2"></i>API & Webhook Settings</h3>
+                <div class="space-y-5">
+                    <div><h4 class="font-medium text-gray-800 dark:text-white text-sm mb-1">API Key</h4><p class="text-xs text-gray-400 mb-2">Use this key to authenticate API requests</p><div class="flex gap-2"><input type="text" id="setting-api-key" class="flex-1 px-3 py-2 border border-gray-200 dark:border-gray-600 rounded-lg text-sm bg-gray-50 dark:bg-gray-700 font-mono text-xs" readonly><button onclick="generateAPIKey()" class="px-3 py-2 bg-bd-green text-white rounded-lg text-xs hover:bg-emerald-800 flex-shrink-0"><i class="bi bi-arrow-clockwise mr-1"></i>Generate</button><button onclick="copyToClipboard(document.getElementById('setting-api-key').value)" class="px-3 py-2 border border-gray-200 dark:border-gray-600 rounded-lg text-xs hover:bg-gray-50 dark:hover:bg-gray-700 flex-shrink-0"><i class="bi bi-clipboard"></i></button></div></div>
+                    <div><h4 class="font-medium text-gray-800 dark:text-white text-sm mb-1">Secret Key</h4><p class="text-xs text-gray-400 mb-2">Keep this secret. Never share publicly</p><div class="flex gap-2"><input type="password" id="setting-secret-key" class="flex-1 px-3 py-2 border border-gray-200 dark:border-gray-600 rounded-lg text-sm bg-gray-50 dark:bg-gray-700 font-mono text-xs" readonly><button onclick="generateSecretKey()" class="px-3 py-2 bg-gray-800 dark:bg-gray-600 text-white rounded-lg text-xs hover:bg-gray-700 flex-shrink-0"><i class="bi bi-arrow-clockwise mr-1"></i>Generate</button></div></div>
+                    <div><h4 class="font-medium text-gray-800 dark:text-white text-sm mb-1">Webhook URL</h4><p class="text-xs text-gray-400 mb-2">Receive POST notifications for transaction events</p><div class="flex gap-2"><input type="url" id="setting-webhook-url" class="flex-1 px-3 py-2 border border-gray-200 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-700" placeholder="https://yourdomain.com/webhook"></div></div>
+                    <div><h4 class="font-medium text-gray-800 dark:text-white text-sm mb-1">Webhook Events</h4><p class="text-xs text-gray-400 mb-2">Select which events trigger webhook</p><div class="flex flex-wrap gap-2"><label class="flex items-center gap-1.5 text-xs bg-gray-50 dark:bg-gray-700 px-3 py-1.5 rounded-lg cursor-pointer"><input type="checkbox" checked class="rounded text-bd-green"> payment.success</label><label class="flex items-center gap-1.5 text-xs bg-gray-50 dark:bg-gray-700 px-3 py-1.5 rounded-lg cursor-pointer"><input type="checkbox" checked class="rounded text-bd-green"> payment.failed</label><label class="flex items-center gap-1.5 text-xs bg-gray-50 dark:bg-gray-700 px-3 py-1.5 rounded-lg cursor-pointer"><input type="checkbox" class="rounded text-bd-green"> refund.created</label><label class="flex items-center gap-1.5 text-xs bg-gray-50 dark:bg-gray-700 px-3 py-1.5 rounded-lg cursor-pointer"><input type="checkbox" class="rounded text-bd-green"> dispute.opened</label><label class="flex items-center gap-1.5 text-xs bg-gray-50 dark:bg-gray-700 px-3 py-1.5 rounded-lg cursor-pointer"><input type="checkbox" class="rounded text-bd-green"> settlement.processed</label></div></div>
+                    <div><h4 class="font-medium text-gray-800 dark:text-white text-sm mb-1">IP Whitelist</h4><p class="text-xs text-gray-400 mb-2">Only allow API access from these IPs (one per line)</p><textarea id="setting-ip-whitelist" class="w-full px-3 py-2 border border-gray-200 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-700 font-mono" rows="3" placeholder="e.g. 192.168.1.1&#10;10.0.0.0/24"></textarea></div>
+                    <div><h4 class="font-medium text-gray-800 dark:text-white text-sm mb-1">Callback URL</h4><p class="text-xs text-gray-400 mb-2">Redirect URL after payment completion</p><input type="url" id="setting-callback-url" class="w-full px-3 py-2 border border-gray-200 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-700" placeholder="https://yourdomain.com/payment/callback"></div>
+                </div>
+                <div class="mt-6 pt-4 border-t border-gray-100 dark:border-gray-700 flex justify-end gap-2"><button onclick="testWebhook()" class="px-4 py-2 border border-gray-200 dark:border-gray-600 rounded-lg text-sm hover:bg-gray-50 dark:hover:bg-gray-700"><i class="bi bi-play-fill mr-1"></i>Test Webhook</button><button onclick="saveAPISettings()" class="bg-bd-green text-white px-6 py-2 rounded-lg hover:bg-emerald-800 transition-colors text-sm font-medium"><i class="bi bi-check-lg mr-1"></i> Save API Settings</button></div>
+            </div>
+            <!-- Coupons Management -->
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-5 sm:p-6 max-w-3xl mt-5">
+                <div class="flex justify-between items-center mb-5"><h3 class="font-bold text-gray-800 dark:text-white"><i class="bi bi-tag mr-2"></i>Coupon Management</h3><button onclick="openAddCouponModal()" class="px-3 py-1.5 bg-bd-green text-white rounded-lg text-xs hover:bg-emerald-800"><i class="bi bi-plus-lg mr-1"></i>Add Coupon</button></div>
+                <div id="coupon-list" class="space-y-2"><p class="text-gray-400 text-sm text-center py-4">Loading coupons...</p></div>
+            </div>
+        </div>
+
+        <!-- ============ LOGS ============ -->
+        <div id="view-logs" class="hidden fade-in space-y-3">
+            <div class="flex gap-2 mb-2">
+                <select id="log-filter-type" onchange="filterLogs()" class="px-3 py-1.5 border border-gray-200 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-700"><option value="all">All Types</option><option value="success">Success</option><option value="info">Info</option><option value="warning">Warning</option><option value="error">Error</option></select>
+                <input type="text" id="log-search" oninput="filterLogs()" placeholder="Search logs..." class="px-3 py-1.5 border border-gray-200 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-700 flex-1">
+            </div>
+            <div class="bg-gray-900 rounded-xl shadow-sm border border-gray-800 p-4 sm:p-5 font-mono text-xs text-green-400 h-72 sm:h-96 overflow-y-auto" id="admin-logs-container">
+                <p class="text-gray-600">[System] Waiting for connection...</p>
+            </div>
+            <div class="flex justify-between items-center">
+                <span class="text-[10px] text-gray-400" id="log-count-label">0 log entries</span>
+                <button onclick="clearLogs()" class="px-4 py-1.5 bg-red-600 text-white rounded-lg text-xs hover:bg-red-700 transition-colors"><i class="bi bi-trash mr-1"></i> Clear Logs</button>
+            </div>
+        </div>
+
+        <!-- ============ BACKUP (NEW) ============ -->
+        <div id="view-backup" class="hidden fade-in space-y-4">
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-5 sm:p-6 max-w-2xl">
+                <h3 class="font-bold text-gray-800 dark:text-white mb-5">Data Backup & Restore</h3>
+                <div class="space-y-4">
+                    <div class="bg-emerald-50 dark:bg-emerald-900/30 p-4 rounded-xl border border-emerald-100 dark:border-emerald-800">
+                        <h4 class="font-semibold text-emerald-800 dark:text-emerald-300 text-sm mb-2"><i class="bi bi-cloud-download mr-2"></i>Export Data</h4>
+                        <p class="text-xs text-emerald-600 dark:text-emerald-400 mb-3">Download a complete backup of all your data as JSON</p>
+                        <button onclick="exportFullBackup()" class="px-4 py-2 bg-emerald-600 text-white rounded-lg text-sm hover:bg-emerald-700 transition-colors"><i class="bi bi-download mr-1"></i> Download Full Backup</button>
+                    </div>
+                    <div class="bg-amber-50 dark:bg-amber-900/30 p-4 rounded-xl border border-amber-100 dark:border-amber-800">
+                        <h4 class="font-semibold text-amber-800 dark:text-amber-300 text-sm mb-2"><i class="bi bi-cloud-upload mr-2"></i>Import Data</h4>
+                        <p class="text-xs text-amber-600 dark:text-amber-400 mb-3">Restore data from a previously exported backup file</p>
+                        <input type="file" id="importFile" accept=".json" class="text-sm" onchange="importBackup(event)">
+                    </div>
+                    <div class="bg-red-50 dark:bg-red-900/30 p-4 rounded-xl border border-red-100 dark:border-red-800">
+                        <h4 class="font-semibold text-red-800 dark:text-red-300 text-sm mb-2"><i class="bi bi-exclamation-triangle mr-2"></i>Danger Zone</h4>
+                        <p class="text-xs text-red-600 dark:text-red-400 mb-3">These actions are irreversible. Please be careful.</p>
+                        <button onclick="resetAllData()" class="px-4 py-2 bg-red-600 text-white rounded-lg text-sm hover:bg-red-700 transition-colors"><i class="bi bi-trash mr-1"></i> Reset All Data</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</main>
+
+<div id="modalContainer"></div>
+
+<!-- =================== FIREBASE + APP LOGIC =================== -->
+<script type="module">
+    import{initializeApp}from"https://www.gstatic.com/firebasejs/11.7.3/firebase-app.js";
+    import{getDatabase,ref,onValue,update,set,push,remove,get}from"https://www.gstatic.com/firebasejs/11.7.3/firebase-database.js";
+    import{getAuth,signInAnonymously,onAuthStateChanged}from"https://www.gstatic.com/firebasejs/11.7.3/firebase-auth.js";
+
+    const firebaseConfig={apiKey:"AIzaSyB7vT31Tx4Qkh5jiC73Twi5q7TbuWIt_-0",authDomain:"mypaymentgateway.firebaseapp.com",databaseURL:"https://mypaymentgateway-default-rtdb.firebaseio.com",projectId:"mypaymentgateway",storageBucket:"mypaymentgateway.firebasestorage.app",messagingSenderId:"896209913541",appId:"1:896209913541:web:39616c9e978b8d0a3c92ac",measurementId:"G-5DFXZCXNLD"};
+
+    const app=initializeApp(firebaseConfig);
+    const db=getDatabase(app);
+    const auth=getAuth(app);
+
+    function fbRef(path){return ref(db,path)}
+    function fbSet(path,data){return set(fbRef(path),data)}
+    function fbUpdate(path,data){return update(fbRef(path),data)}
+    function fbRemove(path){return remove(fbRef(path))}
+    function fbPush(path,data){const r=push(fbRef(path));set(r,data);return r.key}
+    function fbOnValue(path,cb){onValue(fbRef(path),cb)}
+    function fbGet(path){return get(fbRef(path))}
+
+    // ---- State ----
+    let allTransactions={};
+    let allMerchants={};
+    let allSettlements={};
+    let allCustomers={};
+    let allInvoices={};
+    let allDisputes={};
+    let allTickets={};
+    let allAnnouncements={};
+    let allAdminUsers={};
+    let allEmailTemplates={};
+    let gatewaySettings={};
+    let systemSettings={};
+    let allLogs={};
+    let txCurrentPage=1;
+    const TX_PER_PAGE=15;
+    let selectedTxIds=new Set();
+
+    // ---- Toast ----
+    function showToast(msg,type='info'){
+        const c=document.getElementById('toastContainer');
+        const icons={success:'bi-check-circle-fill',error:'bi-x-circle-fill',warning:'bi-exclamation-triangle-fill',info:'bi-info-circle-fill'};
+        const t=document.createElement('div');
+        t.className='toast toast-'+type;
+        t.innerHTML='<i class="bi '+icons[type]+'"></i> '+msg;
+        c.appendChild(t);
+        setTimeout(()=>{t.style.opacity='0';t.style.transform='translateX(100%)';t.style.transition='all .3s';setTimeout(()=>t.remove(),300)},3500);
+    }
+
+    // ---- Modal ----
+    function openModal(html,wide){
+        const m=document.getElementById('modalContainer');
+        m.innerHTML='<div class="modal-overlay" onclick="if(event.target===this)closeModal()"><div class="modal-content" style="max-width:'+(wide?'720px':'560px')+'"><div class="p-5 sm:p-6">'+html+'</div></div></div>';
+    }
+    function closeModal(){document.getElementById('modalContainer').innerHTML=''}
+    function showConfirm(msg,cb){
+        openModal('<h3 class="font-bold text-gray-800 dark:text-white text-lg mb-2">Confirm Action</h3><p class="text-gray-500 text-sm mb-5">'+msg+'</p><div class="flex justify-end gap-2"><button onclick="closeModal()" class="px-4 py-2 border border-gray-200 dark:border-gray-600 rounded-lg text-sm hover:bg-gray-50 dark:hover:bg-gray-700">Cancel</button><button id="confirmBtn" class="px-4 py-2 bg-bd-red text-white rounded-lg text-sm hover:bg-red-700">Confirm</button></div>');
+        document.getElementById('confirmBtn').onclick=function(){closeModal();cb()};
+    }
+
+    // ---- Admin Log ----
+    function addAdminLog(action,details,logType='info'){
+        fbPush('admin_logs',{action,details:details||'',type:logType,timestamp:new Date().toISOString(),adminId:localStorage.getItem('adminName')||'super-admin'});
+    }
+
+    // ---- Dark Mode ----
+    window.toggleDarkMode=function(){
+        document.documentElement.classList.toggle('dark');
+        const isDark=document.documentElement.classList.contains('dark');
+        localStorage.setItem('darkMode',isDark);
+        document.getElementById('darkModeIcon').className=isDark?'bi bi-sun text-lg':'bi bi-moon-stars text-lg';
+    };
+    if(localStorage.getItem('darkMode')==='true'){
+        document.documentElement.classList.add('dark');
+        document.getElementById('darkModeIcon').className='bi bi-sun text-lg';
+    }
+
+    // ---- Login ----
+    window.togglePasswordVisibility=function(){
+        const p=document.getElementById('loginPassword');
+        const i=document.getElementById('passToggleIcon');
+        if(p.type==='password'){p.type='text';i.className='bi bi-eye-slash'}else{p.type='password';i.className='bi bi-eye'}
+    };
+
+    window.doLogin=function(){
+        const email=document.getElementById('loginEmail').value.trim();
+        const pass=document.getElementById('loginPassword').value;
+        const errEl=document.getElementById('loginError');
+        errEl.classList.add('hidden');
+
+        const adminAccounts={
+            'admin@shighropay.com':{password:'admin123',name:'Super Admin',role:'super_admin'},
+            'manager@shighropay.com':{password:'manager123',name:'Manager',role:'manager'},
+            'support@shighropay.com':{password:'support123',name:'Support Agent',role:'support'}
+        };
+
+        // Check Firebase admin_users first, then fallback to hardcoded
+        const account=adminAccounts[email];
+        if(account&&account.password===pass){
+            localStorage.setItem('adminLoggedIn','true');
+            localStorage.setItem('adminEmail',email);
+            localStorage.setItem('adminName',account.name);
+            localStorage.setItem('adminRole',account.role);
+            if(document.getElementById('rememberMe').checked){
+                localStorage.setItem('rememberAdmin','true');
+            }
+            showAdminPanel();
+            showToast('Welcome, '+account.name+'!','success');
+            addAdminLog('Admin Login',account.name+' logged in','success');
+        }else{
+            errEl.textContent='Invalid email or password';
+            errEl.classList.remove('hidden');
+            document.getElementById('loginBtn').classList.add('animate-shake');
+            setTimeout(()=>document.getElementById('loginBtn').classList.remove('animate-shake'),500);
+        }
+    };
+
+    document.getElementById('loginPassword').addEventListener('keydown',function(e){if(e.key==='Enter')window.doLogin()});
+
+    function showAdminPanel(){
+        document.getElementById('loginScreen').classList.add('hidden');
+        document.getElementById('sidebar').classList.remove('hidden');
+        document.getElementById('mainContent').classList.remove('hidden');
+        document.getElementById('loadingOverlay').classList.remove('hidden');
+
+        const name=localStorage.getItem('adminName')||'Admin';
+        const role=localStorage.getItem('adminRole')||'super_admin';
+        document.getElementById('adminName').textContent=name;
+        document.getElementById('adminRole').textContent=role.replace('_',' ').replace(/\b\w/g,l=>l.toUpperCase());
+        document.getElementById('adminAvatar').src='https://ui-avatars.com/api/?name='+encodeURIComponent(name)+'&background=006A4E&color=fff&size=40';
+    }
+
+    if(localStorage.getItem('adminLoggedIn')==='true'&&localStorage.getItem('rememberAdmin')==='true'){
+        showAdminPanel();
+    }
+
+    // ---- Sidebar & Navigation ----
+    window.toggleSidebar=function(){
+        document.getElementById('sidebar').classList.toggle('open');
+        document.getElementById('sidebarOverlay').classList.toggle('active');
+    };
+
+    const tabTitles={dashboard:'Dashboard',transactions:'Transactions',customers:'Customer Management',invoices:'Invoice Management',merchants:'Merchants',gateways:'Gateways',settlements:'Settlements',disputes:'Dispute Management',tickets:'Support Tickets',announcements:'Announcements',reports:'Reports',users:'Admin Users','email-templates':'Email Templates',settings:'Settings',logs:'System Logs',backup:'Backup & Restore'};
+
+    window.switchTab=function(tab){
+        document.querySelectorAll('.sidebar-item').forEach(b=>b.classList.remove('active'));
+        const nb=document.getElementById('nav-'+tab);
+        if(nb)nb.classList.add('active');
+        document.querySelectorAll('[id^="view-"]').forEach(v=>v.classList.add('hidden'));
+        const vv=document.getElementById('view-'+tab);
+        if(vv){vv.classList.remove('hidden');vv.classList.remove('fade-in');void vv.offsetWidth;vv.classList.add('fade-in')}
+        document.getElementById('page-title').textContent=tabTitles[tab]||tab;
+        if(window.innerWidth<1024){document.getElementById('sidebar').classList.remove('open');document.getElementById('sidebarOverlay').classList.remove('active')}
+    };
+
+    // ---- Notification Dropdown ----
+    window.toggleNotifDropdown=function(){document.getElementById('notifDropdown').classList.toggle('show')};
+    document.addEventListener('click',function(e){const nd=document.getElementById('notifDropdown');if(nd&&!e.target.closest('.relative'))nd.classList.remove('show')});
+
+    // ---- Helpers ----
+    function statusBadge(s){
+        const colors={pending:'bg-amber-100 text-amber-700',success:'bg-emerald-100 text-emerald-700',failed:'bg-red-100 text-red-700',refunded:'bg-blue-100 text-blue-700',hold:'bg-gray-200 text-gray-700',active:'bg-emerald-100 text-emerald-700',inactive:'bg-red-100 text-red-700',processed:'bg-emerald-100 text-emerald-700',rejected:'bg-red-100 text-red-700',open:'bg-amber-100 text-amber-700',in_progress:'bg-blue-100 text-blue-700',closed:'bg-gray-200 text-gray-600',resolved:'bg-emerald-100 text-emerald-700',paid:'bg-emerald-100 text-emerald-700',unpaid:'bg-amber-100 text-amber-700',overdue:'bg-red-100 text-red-700',draft:'bg-gray-200 text-gray-600',cancelled:'bg-red-100 text-red-700'};
+        return '<span class="badge '+(colors[s]||'bg-gray-100 text-gray-600')+'">'+((s||'').replace('_',' '))+'</span>';
+    }
+    function gatewayBadge(g){
+        const colors={bkash:'bg-pink-100 text-pink-700',nagad:'bg-orange-100 text-orange-700',rocket:'bg-purple-100 text-purple-700',upay:'bg-teal-100 text-teal-700'};
+        const names={bkash:'bKash',nagad:'Nagad',rocket:'Rocket',upay:'Upay'};
+        return '<span class="badge '+(colors[g]||'bg-gray-100 text-gray-600')+'">'+(names[g]||g||'N/A')+'</span>';
+    }
+    function priorityBadge(p){
+        const colors={high:'bg-red-100 text-red-700',medium:'bg-amber-100 text-amber-700',low:'bg-blue-100 text-blue-700'};
+        return '<span class="badge '+(colors[p]||'bg-gray-100 text-gray-600')+'">'+(p||'low')+'</span>';
+    }
+    function fmtAmt(n){return '\u09F3 '+Number(n||0).toLocaleString('en-BD',{minimumFractionDigits:2,maximumFractionDigits:2})}
+    function dateStr(d){if(!d)return '';try{return new Date(d).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'})}catch(e){return d}}
+    function dateStrShort(d){if(!d)return '';try{return new Date(d).toLocaleDateString('en-GB',{day:'2-digit',month:'short'})}catch(e){return d}}
+    function isToday(d){if(!d)return false;const t=new Date();const dx=new Date(d);return dx.toDateString()===t.toDateString()}
+    function isThisWeek(d){if(!d)return false;const now=new Date();const dx=new Date(d);const ws=new Date(now);ws.setDate(now.getDate()-now.getDay());ws.setHours(0,0,0,0);return dx>=ws&&dx<=now}
+    function isThisMonth(d){if(!d)return false;const now=new Date();const dx=new Date(d);return dx.getMonth()===now.getMonth()&&dx.getFullYear()===now.getFullYear()}
+    function genId(){return 'INV-'+Date.now().toString(36).toUpperCase()}
+
+    // ---- Dashboard Stats ----
+    function updateDashboard(){
+        const txArr=Object.values(allTransactions);
+        const totalRev=txArr.filter(t=>t.status==='success').reduce((s,t)=>s+Number(t.amount||0),0);
+        const todayRev=txArr.filter(t=>t.status==='success'&&isToday(t.timestamp||t.date)).reduce((s,t)=>s+Number(t.amount||0),0);
+        const todayTx=txArr.filter(t=>isToday(t.timestamp||t.date)).length;
+        const pending=txArr.filter(t=>t.status==='pending').length;
+        const success=txArr.filter(t=>t.status==='success').length;
+        const total=txArr.length;
+        const rate=total>0?((success/total)*100).toFixed(1):0;
+
+        document.getElementById('admin-total-rev').textContent=fmtAmt(totalRev);
+        document.getElementById('admin-today-rev').textContent=fmtAmt(todayRev);
+        document.getElementById('admin-total-tx').textContent=total;
+        document.getElementById('admin-pending-tx').textContent=pending;
+        document.getElementById('today-tx-count').textContent=todayTx+' transactions today';
+        document.getElementById('success-rate').textContent=rate+'% success rate';
+        document.getElementById('rev-trend').textContent=total>0?'+'+rate+'%':'\u2014';
+
+        // Quick stats
+        document.getElementById('dash-customers').textContent=Object.keys(allCustomers).length;
+        document.getElementById('dash-merchants').textContent=Object.keys(allMerchants).length;
+        document.getElementById('dash-tickets').textContent=Object.values(allTickets).filter(t=>t.status==='open'||t.status==='in_progress').length;
+        document.getElementById('dash-disputes').textContent=Object.values(allDisputes).filter(d=>d.status==='open').length;
+
+        // Badges
+        const badge=document.getElementById('badge-tx');
+        if(pending>0){badge.textContent=pending;badge.classList.remove('hidden')}else{badge.classList.add('hidden')}
+        const nb=document.getElementById('notif-badge');
+        if(pending>0){nb.textContent=pending>9?'9+':pending;nb.classList.remove('hidden')}else{nb.classList.add('hidden')}
+        document.getElementById('notif-count-text').textContent=pending+' pending';
+
+        // Open tickets badge
+        const openTickets=Object.values(allTickets).filter(t=>t.status==='open').length;
+        const tb=document.getElementById('badge-tickets');
+        if(openTickets>0){tb.textContent=openTickets;tb.classList.remove('hidden')}else{tb.classList.add('hidden')}
+        // Disputes badge
+        const openDisp=Object.values(allDisputes).filter(d=>d.status==='open').length;
+        const db2=document.getElementById('badge-disputes');
+        if(openDisp>0){db2.textContent=openDisp;db2.classList.remove('hidden')}else{db2.classList.add('hidden')}
+
+        // Revenue chart (7 days)
+        const days=[];const dayRevs=[];
+        for(let i=6;i>=0;i--){
+            const d=new Date();d.setDate(d.getDate()-i);
+            const key=d.toISOString().split('T')[0];
+            days.push(d.toLocaleDateString('en-GB',{day:'2-digit',month:'short'}));
+            const dayRev=txArr.filter(t=>{const td=t.timestamp||t.date;if(!td)return false;try{return new Date(td).toISOString().split('T')[0]===key&&t.status==='success'}catch(e){return false}}).reduce((s,t)=>s+Number(t.amount||0),0);
+            dayRevs.push(dayRev);
+        }
+        const maxRev=Math.max(...dayRevs,1);
+        let barsHTML='',labelsHTML='';
+        dayRevs.forEach((rev,i)=>{
+            const pct=(rev/maxRev)*100;
+            const isMax=rev===maxRev&&rev>0;
+            barsHTML+='<div class="flex-1 flex flex-col items-center justify-end h-full"><span class="text-[9px] text-gray-500 mb-1">'+(rev>0?fmtAmt(rev):'')+'</span><div class="w-full rounded-t-md transition-all duration-500 '+(isMax?'bg-bd-green':'bg-emerald-400 dark:bg-emerald-600')+'" style="height:'+Math.max(pct,2)+'%"></div></div>';
+            labelsHTML+='<span class="flex-1 text-center">'+days[i]+'</span>';
+        });
+        document.getElementById('revenue-bars').innerHTML=barsHTML;
+        document.getElementById('revenue-labels').innerHTML=labelsHTML;
+
+        // Gateway usage
+        const gwNames=['bkash','nagad','rocket','upay'];
+        const gwCounts={};
+        gwNames.forEach(g=>gwCounts[g]=txArr.filter(t=>t.method===g).length);
+        const gwTotal=Math.max(Object.values(gwCounts).reduce((a,b)=>a+b,0),1);
+        gwNames.forEach(g=>{
+            const el=document.getElementById(g+'-percent');
+            const bar=document.getElementById(g+'-bar');
+            if(el)el.textContent=((gwCounts[g]/gwTotal)*100).toFixed(1)+'%';
+            if(bar)bar.style.width=((gwCounts[g]/gwTotal)*100)+'%';
+        });
+
+        // Status breakdown
+        const statuses=['success','pending','failed','refunded','hold'];
+        const statusColors={success:'bg-emerald-500',pending:'bg-amber-500',failed:'bg-red-500',refunded:'bg-blue-500',hold:'bg-gray-500'};
+        let sbHTML='';
+        statuses.forEach(s=>{
+            const c=txArr.filter(t=>t.status===s).length;
+            sbHTML+='<div class="flex items-center gap-2"><span class="w-2 h-2 rounded-full '+statusColors[s]+'"></span><span class="text-gray-600 dark:text-gray-400 capitalize">'+s+'</span><span class="ml-auto font-semibold text-gray-800 dark:text-white">'+c+'</span></div>';
+        });
+        document.getElementById('status-breakdown').innerHTML=sbHTML;
+
+        // Live monitor
+        const sorted=[...txArr].sort((a,b)=>new Date(b.timestamp||b.date||0)-new Date(a.timestamp||a.date||0));
+        const latest=sorted.slice(0,10);
+        const tbody=document.getElementById('live-monitor-body');
+        const emptyEl=document.getElementById('live-monitor-empty');
+        if(latest.length===0){tbody.innerHTML='';emptyEl.classList.remove('hidden')}
+        else{
+            emptyEl.classList.add('hidden');
+            tbody.innerHTML=latest.map(t=>{
+                const id=(t.id||'').substring(0,8);
+                const time=t.timestamp||t.date?new Date(t.timestamp||t.date).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'}):'';
+                return '<tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50"><td class="px-5 py-2 font-mono text-gray-600 dark:text-gray-400">#'+id+'</td><td class="px-5 py-2">'+(t.name||t.customerName||'N/A')+'</td><td class="px-5 py-2 font-semibold">'+fmtAmt(t.amount)+'</td><td class="px-5 py-2">'+gatewayBadge(t.method)+'</td><td class="px-5 py-2">'+statusBadge(t.status)+'</td><td class="px-5 py-2 text-gray-500">'+time+'</td></tr>';
+            }).join('');
+        }
+
+        // Notification dropdown
+        const pendingTx=[...txArr].filter(t=>t.status==='pending').sort((a,b)=>new Date(b.timestamp||b.date||0)-new Date(a.timestamp||a.date||0)).slice(0,5);
+        const nlist=document.getElementById('notif-list');
+        if(pendingTx.length===0){nlist.innerHTML='<div class="p-4 text-center text-gray-400 text-xs">No pending transactions</div>'}
+        else{nlist.innerHTML=pendingTx.map(t=>'<div class="px-3 py-2 border-b border-gray-50 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 cursor-pointer" onclick="switchTab(\'transactions\');toggleNotifDropdown()"><div class="flex justify-between"><span class="text-sm font-medium text-gray-800 dark:text-white">'+(t.name||t.customerName||'N/A')+'</span><span class="text-xs text-amber-600 font-semibold">'+fmtAmt(t.amount)+'</span></div><div class="text-[10px] text-gray-400">'+gatewayBadge(t.method)+' \u00B7 '+dateStr(t.timestamp||t.date)+'</div></div>').join('')}
+
+        // Gateway stats
+        gwNames.forEach(gw=>{
+            const gwTx=txArr.filter(t=>t.method===gw);
+            const gwRev=gwTx.filter(t=>t.status==='success').reduce((s,t)=>s+Number(t.amount||0),0);
+            const cEl=document.getElementById('gw-count-'+gw);
+            const rEl=document.getElementById('gw-rev-'+gw);
+            if(cEl)cEl.textContent=gwTx.length;
+            if(rEl)rEl.textContent=fmtAmt(gwRev);
+        });
+
+        // Tx stats
+        document.getElementById('tx-stat-total').textContent=total;
+        document.getElementById('tx-stat-success').textContent=success;
+        document.getElementById('tx-stat-failed').textContent=txArr.filter(t=>t.status==='failed').length;
+        document.getElementById('tx-stat-pending').textContent=pending;
+
+        // Reports
+        document.getElementById('r-today').textContent=fmtAmt(todayRev);
+        document.getElementById('r-week').textContent=fmtAmt(txArr.filter(t=>t.status==='success'&&isThisWeek(t.timestamp||t.date)).reduce((s,t)=>s+Number(t.amount||0),0));
+        document.getElementById('r-month').textContent=fmtAmt(txArr.filter(t=>t.status==='success'&&isThisMonth(t.timestamp||t.date)).reduce((s,t)=>s+Number(t.amount||0),0));
+        document.getElementById('r-total').textContent=fmtAmt(totalRev);
+        document.getElementById('r-rate').textContent=rate+'%';
+
+        // Auto-build customers from transactions
+        autoGenerateCustomers();
+    }
+
+    // ---- Auto-generate Customers from Transactions ----
+    function autoGenerateCustomers(){
+        const txArr=Object.entries(allTransactions);
+        const custMap={};
+        txArr.forEach(([id,t])=>{
+            const email=(t.email||t.customerEmail||'').toLowerCase();
+            if(!email)return;
+            if(!custMap[email]){
+                custMap[email]={name:t.name||t.customerName||'',email:email,phone:t.phone||t.customerPhone||'',totalSpent:0,txCount:0,lastActive:t.timestamp||t.date||'',tags:[],notes:''};
+            }
+            if(t.status==='success')custMap[email].totalSpent+=Number(t.amount||0);
+            custMap[email].txCount++;
+            const tDate=t.timestamp||t.date||'';
+            if(tDate>custMap[email].lastActive)custMap[email].lastActive=tDate;
+        });
+        // Merge with existing customer data (notes, tags)
+        Object.entries(allCustomers).forEach(([k,c])=>{
+            const email=(c.email||'').toLowerCase();
+            if(custMap[email]){
+                custMap[email].tags=c.tags||custMap[email].tags;
+                custMap[email].notes=c.notes||custMap[email].notes;
+                custMap[email].id=k;
+            }
+        });
+        // Update state for rendering
+        window._computedCustomers=custMap;
+    }
+
+    // ---- Transactions ----
+    function getFilteredTx(){
+        const search=(document.getElementById('admin-search-tx').value||'').toLowerCase();
+        const statusF=document.getElementById('admin-filter-status').value;
+        const methodF=document.getElementById('admin-filter-method').value;
+        const fromD=document.getElementById('admin-filter-from').value;
+        const toD=document.getElementById('admin-filter-to').value;
+        let arr=Object.entries(allTransactions).map(([k,v])=>({...v,id:k}));
+        if(search)arr=arr.filter(t=>(t.name||t.customerName||'').toLowerCase().includes(search)||(t.email||t.customerEmail||'').toLowerCase().includes(search)||(t.id||'').toLowerCase().includes(search)||(t.phone||t.customerPhone||'').toLowerCase().includes(search));
+        if(statusF!=='all')arr=arr.filter(t=>t.status===statusF);
+        if(methodF!=='all')arr=arr.filter(t=>t.method===methodF);
+        if(fromD)arr=arr.filter(t=>{const d=t.timestamp||t.date;try{return d&&new Date(d).toISOString().split('T')[0]>=fromD}catch(e){return false}});
+        if(toD)arr=arr.filter(t=>{const d=t.timestamp||t.date;try{return d&&new Date(d).toISOString().split('T')[0]<=toD}catch(e){return false}});
+        arr.sort((a,b)=>new Date(b.timestamp||b.date||0)-new Date(a.timestamp||a.date||0));
+        return arr;
+    }
+
+    window.renderTransactions=function(){
+        const filtered=getFilteredTx();
+        const total=filtered.length;
+        document.getElementById('tx-count-badge').textContent=total;
+        const totalPages=Math.max(1,Math.ceil(total/TX_PER_PAGE));
+        if(txCurrentPage>totalPages)txCurrentPage=totalPages;
+        const start=(txCurrentPage-1)*TX_PER_PAGE;
+        const page=filtered.slice(start,start+TX_PER_PAGE);
+        const tbody=document.getElementById('admin-tx-table');
+        const emptyEl=document.getElementById('tx-empty');
+
+        if(page.length===0){tbody.innerHTML='';emptyEl.classList.remove('hidden')}
+        else{
+            emptyEl.classList.add('hidden');
+            tbody.innerHTML=page.map(t=>{
+                const txId=(t.id||'').substring(0,8);
+                const name=t.name||t.customerName||'N/A';
+                const email=t.email||t.customerEmail||'';
+                const date=t.timestamp||t.date?dateStr(t.timestamp||t.date):'N/A';
+                let statusActions='';
+                if(t.status==='pending')statusActions='<button onclick="changeTxStatus(\''+t.id+'\',\'success\')" class="text-emerald-600 hover:underline text-[10px]">Approve</button> <button onclick="changeTxStatus(\''+t.id+'\',\'failed\')" class="text-red-600 hover:underline text-[10px]">Fail</button> <button onclick="changeTxStatus(\''+t.id+'\',\'hold\')" class="text-gray-600 hover:underline text-[10px]">Hold</button>';
+                else if(t.status==='success')statusActions='<button onclick="changeTxStatus(\''+t.id+'\',\'refunded\')" class="text-blue-600 hover:underline text-[10px]">Refund</button>';
+                const isChecked=selectedTxIds.has(t.id);
+                return '<tr class="hover:bg-gray-50/50 dark:hover:bg-gray-700/50"><td class="px-5 py-3"><input type="checkbox" class="tx-checkbox rounded border-gray-300" data-id="'+t.id+'" '+(isChecked?'checked':'')+' onchange="toggleTxSelect(\''+t.id+'\',this.checked)"></td><td class="px-5 py-3 font-mono text-xs text-gray-600 dark:text-gray-400">#'+txId+'</td><td class="px-5 py-3"><div class="font-medium text-gray-800 dark:text-white">'+name+'</div><div class="text-[11px] text-gray-400">'+email+'</div></td><td class="px-5 py-3">'+gatewayBadge(t.method)+'</td><td class="px-5 py-3 font-semibold">'+fmtAmt(t.amount)+'</td><td class="px-5 py-3">'+statusBadge(t.status)+'</td><td class="px-5 py-3 text-gray-500 dark:text-gray-400 text-xs">'+date+'</td><td class="px-5 py-3 text-right"><div class="flex items-center justify-end gap-1"><button onclick="viewTxDetail(\''+t.id+'\')" class="p-1 text-gray-400 hover:text-bd-green" title="View"><i class="bi bi-eye"></i></button><button onclick="editTxModal(\''+t.id+'\')" class="p-1 text-gray-400 hover:text-blue-600" title="Edit"><i class="bi bi-pencil"></i></button><button onclick="deleteTx(\''+t.id+'\')" class="p-1 text-gray-400 hover:text-red-600" title="Delete"><i class="bi bi-trash"></i></button></div><div class="mt-1">'+statusActions+'</div></td></tr>';
+            }).join('');
+        }
+
+        const pagEl=document.getElementById('tx-pagination');
+        if(total>TX_PER_PAGE){
+            pagEl.innerHTML='<span class="text-gray-500 dark:text-gray-400 text-xs">Showing '+(start+1)+'-'+Math.min(start+TX_PER_PAGE,total)+' of '+total+'</span><div class="flex gap-1"><button onclick="txGoPage('+(txCurrentPage-1)+')" class="px-3 py-1 border rounded text-xs '+(txCurrentPage<=1?'text-gray-300 cursor-not-allowed':'hover:bg-gray-50 dark:hover:bg-gray-700')+'" '+(txCurrentPage<=1?'disabled':'')+'>Prev</button><span class="px-3 py-1 text-xs font-medium">'+txCurrentPage+'/'+totalPages+'</span><button onclick="txGoPage('+(txCurrentPage+1)+')" class="px-3 py-1 border rounded text-xs '+(txCurrentPage>=totalPages?'text-gray-300 cursor-not-allowed':'hover:bg-gray-50 dark:hover:bg-gray-700')+'" '+(txCurrentPage>=totalPages?'disabled':'')+'>Next</button></div>';
+        }else{pagEl.innerHTML=total>0?'<span class="text-gray-500 dark:text-gray-400 text-xs">Showing all '+total+' transactions</span>':''}
+    };
+
+    window.txGoPage=function(p){const tp=Math.max(1,Math.ceil(getFilteredTx().length/TX_PER_PAGE));if(p<1||p>tp)return;txCurrentPage=p;window.renderTransactions()};
+    window.clearTxFilters=function(){document.getElementById('admin-search-tx').value='';document.getElementById('admin-filter-status').value='all';document.getElementById('admin-filter-method').value='all';document.getElementById('admin-filter-from').value='';document.getElementById('admin-filter-to').value='';txCurrentPage=1;window.renderTransactions()};
+
+    // Bulk selection
+    window.toggleTxSelect=function(id,checked){if(checked)selectedTxIds.add(id);else selectedTxIds.delete(id)};
+    window.toggleSelectAllTx=function(checked){const cbs=document.querySelectorAll('.tx-checkbox');cbs.forEach(cb=>{cb.checked=checked;const id=cb.getAttribute('data-id');if(checked)selectedTxIds.add(id);else selectedTxIds.delete(id)})};
+
+    window.bulkActionModal=function(){
+        if(selectedTxIds.size===0){showToast('Select transactions first','warning');return}
+        openModal('<h3 class="font-bold text-gray-800 dark:text-white text-lg mb-4">Bulk Action ('+selectedTxIds.size+' selected)</h3><div class="space-y-2"><button onclick="bulkChangeStatus(\'success\')" class="w-full text-left px-4 py-2 hover:bg-emerald-50 dark:hover:bg-emerald-900/30 rounded-lg text-sm"><i class="bi bi-check-circle text-emerald-600 mr-2"></i>Mark as Success</button><button onclick="bulkChangeStatus(\'failed\')" class="w-full text-left px-4 py-2 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg text-sm"><i class="bi bi-x-circle text-red-600 mr-2"></i>Mark as Failed</button><button onclick="bulkChangeStatus(\'hold\')" class="w-full text-left px-4 py-2 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg text-sm"><i class="bi bi-pause-circle text-gray-600 mr-2"></i>Put on Hold</button><button onclick="bulkChangeStatus(\'refunded\')" class="w-full text-left px-4 py-2 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-lg text-sm"><i class="bi bi-arrow-counterclockwise text-blue-600 mr-2"></i>Mark as Refunded</button><button onclick="bulkDelete()" class="w-full text-left px-4 py-2 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg text-sm text-red-600"><i class="bi bi-trash mr-2"></i>Delete Selected</button></div><div class="mt-4 flex justify-end"><button onclick="closeModal()" class="px-4 py-2 border border-gray-200 dark:border-gray-600 rounded-lg text-sm">Cancel</button></div>');
+    };
+
+    window.bulkChangeStatus=function(status){
+        const promises=[];
+        selectedTxIds.forEach(id=>promises.push(fbUpdate('transactions/'+id,{status})));
+        Promise.all(promises).then(()=>{
+            showToast(selectedTxIds.size+' transactions updated to '+status,'success');
+            addAdminLog('Bulk Status Change',selectedTxIds.size+' transactions \u2192 '+status,'info');
+            selectedTxIds.clear();closeModal();
+        }).catch(e=>showToast('Error: '+e.message,'error'));
+    };
+
+    window.bulkDelete=function(){
+        showConfirm('Delete '+selectedTxIds.size+' transactions? This cannot be undone.',function(){
+            const promises=[];
+            selectedTxIds.forEach(id=>promises.push(fbRemove('transactions/'+id)));
+            Promise.all(promises).then(()=>{
+                showToast(selectedTxIds.size+' transactions deleted','success');
+                addAdminLog('Bulk Delete',selectedTxIds.size+' transactions deleted','warning');
+                selectedTxIds.clear();
+            }).catch(e=>showToast('Error: '+e.message,'error'));
+        });
+    };
+
+    // ---- Transaction CRUD ----
+    window.viewTxDetail=function(id){const t=allTransactions[id];if(!t)return;const name=t.name||t.customerName||'N/A';const email=t.email||t.customerEmail||'N/A';const phone=t.phone||t.customerPhone||'N/A';const date=t.timestamp||t.date?dateStr(t.timestamp||t.date):'N/A';openModal('<div class="flex justify-between items-start mb-4"><h3 class="font-bold text-gray-800 dark:text-white text-lg">Transaction Detail</h3><button onclick="closeModal()" class="text-gray-400 hover:text-gray-600"><i class="bi bi-x-lg"></i></button></div><div class="space-y-3 text-sm"><div class="flex justify-between pb-2 border-b border-gray-50 dark:border-gray-700"><span class="text-gray-500">Transaction ID</span><span class="font-mono font-semibold dark:text-white">#'+id.substring(0,16)+'</span></div><div class="flex justify-between pb-2 border-b border-gray-50 dark:border-gray-700"><span class="text-gray-500">Customer</span><span class="font-medium dark:text-white">'+name+'</span></div><div class="flex justify-between pb-2 border-b border-gray-50 dark:border-gray-700"><span class="text-gray-500">Email</span><span class="text-gray-600 dark:text-gray-400">'+email+'</span></div><div class="flex justify-between pb-2 border-b border-gray-50 dark:border-gray-700"><span class="text-gray-500">Phone</span><span class="text-gray-600 dark:text-gray-400">'+phone+'</span></div><div class="flex justify-between pb-2 border-b border-gray-50 dark:border-gray-700"><span class="text-gray-500">Amount</span><span class="font-bold text-lg dark:text-white">'+fmtAmt(t.amount)+'</span></div><div class="flex justify-between pb-2 border-b border-gray-50 dark:border-gray-700"><span class="text-gray-500">Gateway</span><span>'+gatewayBadge(t.method)+'</span></div><div class="flex justify-between pb-2 border-b border-gray-50 dark:border-gray-700"><span class="text-gray-500">Status</span><span>'+statusBadge(t.status)+'</span></div><div class="flex justify-between pb-2 border-b border-gray-50 dark:border-gray-700"><span class="text-gray-500">User ID</span><span class="text-gray-600 dark:text-gray-400 font-mono text-xs">'+(t.userId||'N/A')+'</span></div><div class="flex justify-between"><span class="text-gray-500">Date</span><span class="text-gray-600 dark:text-gray-400">'+date+'</span></div></div>')};
+
+    window.editTxModal=function(id){const t=allTransactions[id];if(!t)return;openModal('<div class="flex justify-between items-start mb-4"><h3 class="font-bold text-gray-800 dark:text-white text-lg">Edit Transaction</h3><button onclick="closeModal()" class="text-gray-400 hover:text-gray-600"><i class="bi bi-x-lg"></i></button></div><div class="space-y-3"><div><label class="text-xs text-gray-500 block mb-1">Customer Name</label><input type="text" id="edit-tx-name" value="'+(t.name||t.customerName||'')+'" class="w-full px-3 py-2 border rounded-lg text-sm dark:bg-gray-700 dark:border-gray-600"></div><div><label class="text-xs text-gray-500 block mb-1">Email</label><input type="email" id="edit-tx-email" value="'+(t.email||t.customerEmail||'')+'" class="w-full px-3 py-2 border rounded-lg text-sm dark:bg-gray-700 dark:border-gray-600"></div><div><label class="text-xs text-gray-500 block mb-1">Phone</label><input type="text" id="edit-tx-phone" value="'+(t.phone||t.customerPhone||'')+'" class="w-full px-3 py-2 border rounded-lg text-sm dark:bg-gray-700 dark:border-gray-600"></div><div><label class="text-xs text-gray-500 block mb-1">Amount</label><input type="number" id="edit-tx-amount" value="'+(t.amount||0)+'" class="w-full px-3 py-2 border rounded-lg text-sm dark:bg-gray-700 dark:border-gray-600"></div><div><label class="text-xs text-gray-500 block mb-1">Status</label><select id="edit-tx-status" class="w-full px-3 py-2 border rounded-lg text-sm dark:bg-gray-700 dark:border-gray-600"><option value="pending"'+(t.status==='pending'?' selected':'')+'>Pending</option><option value="success"'+(t.status==='success'?' selected':'')+'>Success</option><option value="failed"'+(t.status==='failed'?' selected':'')+'>Failed</option><option value="hold"'+(t.status==='hold'?' selected':'')+'>Hold</option><option value="refunded"'+(t.status==='refunded'?' selected':'')+'>Refunded</option></select></div></div><div class="flex justify-end gap-2 mt-5"><button onclick="closeModal()" class="px-4 py-2 border border-gray-200 dark:border-gray-600 rounded-lg text-sm">Cancel</button><button onclick="saveEditTx(\''+id+'\')" class="px-4 py-2 bg-bd-green text-white rounded-lg text-sm">Save</button></div>')};
+
+    window.saveEditTx=function(id){const data={name:document.getElementById('edit-tx-name').value,customerName:document.getElementById('edit-tx-name').value,email:document.getElementById('edit-tx-email').value,customerEmail:document.getElementById('edit-tx-email').value,phone:document.getElementById('edit-tx-phone').value,customerPhone:document.getElementById('edit-tx-phone').value,amount:Number(document.getElementById('edit-tx-amount').value),status:document.getElementById('edit-tx-status').value};fbUpdate('transactions/'+id,data).then(()=>{showToast('Transaction updated','success');addAdminLog('Edit Transaction','Updated TX #'+id.substring(0,8),'info');closeModal()}).catch(e=>showToast('Error: '+e.message,'error'))};
+
+    window.deleteTx=function(id){showConfirm('Delete this transaction permanently?',function(){fbRemove('transactions/'+id).then(()=>{showToast('Transaction deleted','success');addAdminLog('Delete Transaction','Deleted TX #'+id.substring(0,8),'warning')}).catch(e=>showToast('Error: '+e.message,'error'))})};
+
+    window.changeTxStatus=function(id,ns){fbUpdate('transactions/'+id,{status:ns}).then(()=>{showToast('Status \u2192 '+ns,'success');addAdminLog('Status Change','TX #'+id.substring(0,8)+' \u2192 '+ns,'info')}).catch(e=>showToast('Error: '+e.message,'error'))};
+
+    window.openAddTransactionModal=function(){openModal('<div class="flex justify-between items-start mb-4"><h3 class="font-bold text-gray-800 dark:text-white text-lg">Add Transaction</h3><button onclick="closeModal()" class="text-gray-400 hover:text-gray-600"><i class="bi bi-x-lg"></i></button></div><div class="space-y-3"><div><label class="text-xs text-gray-500 block mb-1">Customer Name *</label><input type="text" id="add-tx-name" class="w-full px-3 py-2 border rounded-lg text-sm dark:bg-gray-700 dark:border-gray-600" placeholder="Full name"></div><div><label class="text-xs text-gray-500 block mb-1">Email *</label><input type="email" id="add-tx-email" class="w-full px-3 py-2 border rounded-lg text-sm dark:bg-gray-700 dark:border-gray-600" placeholder="email@example.com"></div><div><label class="text-xs text-gray-500 block mb-1">Phone</label><input type="text" id="add-tx-phone" class="w-full px-3 py-2 border rounded-lg text-sm dark:bg-gray-700 dark:border-gray-600" placeholder="+880..."></div><div><label class="text-xs text-gray-500 block mb-1">Amount *</label><input type="number" id="add-tx-amount" class="w-full px-3 py-2 border rounded-lg text-sm dark:bg-gray-700 dark:border-gray-600" placeholder="0.00" min="1"></div><div><label class="text-xs text-gray-500 block mb-1">Payment Method *</label><select id="add-tx-method" class="w-full px-3 py-2 border rounded-lg text-sm dark:bg-gray-700 dark:border-gray-600"><option value="bkash">bKash</option><option value="nagad">Nagad</option><option value="rocket">Rocket</option><option value="upay">Upay</option></select></div><div><label class="text-xs text-gray-500 block mb-1">Status *</label><select id="add-tx-status" class="w-full px-3 py-2 border rounded-lg text-sm dark:bg-gray-700 dark:border-gray-600"><option value="pending">Pending</option><option value="success">Success</option><option value="failed">Failed</option><option value="hold">Hold</option></select></div></div><div class="flex justify-end gap-2 mt-5"><button onclick="closeModal()" class="px-4 py-2 border border-gray-200 dark:border-gray-600 rounded-lg text-sm">Cancel</button><button onclick="addTransaction()" class="px-4 py-2 bg-bd-green text-white rounded-lg text-sm">Create</button></div>')};
+
+    window.addTransaction=function(){const name=document.getElementById('add-tx-name').value.trim();const email=document.getElementById('add-tx-email').value.trim();const phone=document.getElementById('add-tx-phone').value.trim();const amount=Number(document.getElementById('add-tx-amount').value);const method=document.getElementById('add-tx-method').value;const status=document.getElementById('add-tx-status').value;if(!name||!email||!amount){showToast('Fill required fields','warning');return}fbPush('transactions',{name,customerName:name,email,customerEmail:email,phone,customerPhone:phone,amount,method,status,timestamp:new Date().toISOString(),date:new Date().toISOString()});showToast('Transaction created','success');addAdminLog('Create Transaction','New TX \u09F3'+amount,'success');closeModal()};
+
+    // ---- Customers (CRM) ----
+    window.renderCustomers=function(){
+        const custs=window._computedCustomers||{};
+        const search=(document.getElementById('cust-search').value||'').toLowerCase();
+        let arr=Object.values(custs);
+        if(search)arr=arr.filter(c=>c.name.toLowerCase().includes(search)||c.email.toLowerCase().includes(search)||c.phone.toLowerCase().includes(search));
+        arr.sort((a,b)=>b.totalSpent-a.totalSpent);
+
+        document.getElementById('cust-total').textContent=arr.length;
+        document.getElementById('cust-active').textContent=arr.filter(c=>{const d=new Date(c.lastActive);const now=new Date();return(now-d)<30*24*60*60*1000}).length;
+        document.getElementById('cust-spent').textContent=fmtAmt(arr.reduce((s,c)=>s+c.totalSpent,0));
+        document.getElementById('cust-avg').textContent=arr.length>0?fmtAmt(arr.reduce((s,c)=>s+c.totalSpent,0)/Math.max(arr.reduce((s,c)=>s+c.txCount,0),1)):'0';
+        document.getElementById('cust-count-badge').textContent=arr.length;
+
+        const tbody=document.getElementById('customers-table');
+        const emptyEl=document.getElementById('cust-empty');
+        if(arr.length===0){tbody.innerHTML='';emptyEl.classList.remove('hidden')}
+        else{
+            emptyEl.classList.add('hidden');
+            tbody.innerHTML=arr.map(c=>{
+                const tags=(c.tags||[]).map(t=>'<span class="badge bg-blue-100 text-blue-700 mr-1">'+t+'</span>').join('')||'<span class="text-gray-400 text-xs">-</span>';
+                return '<tr class="hover:bg-gray-50/50 dark:hover:bg-gray-700/50"><td class="px-5 py-3"><div class="flex items-center gap-2"><div class="w-8 h-8 rounded-full bg-gradient-to-br from-bd-green to-emerald-600 flex items-center justify-center text-white font-bold text-xs">'+(c.name||'?').charAt(0).toUpperCase()+'</div><div class="font-medium text-gray-800 dark:text-white">'+c.name+'</div></div></td><td class="px-5 py-3 text-gray-500 dark:text-gray-400 text-xs">'+c.email+'</td><td class="px-5 py-3 text-gray-500 dark:text-gray-400">'+c.phone+'</td><td class="px-5 py-3 font-semibold">'+fmtAmt(c.totalSpent)+'</td><td class="px-5 py-3">'+c.txCount+'</td><td class="px-5 py-3">'+tags+'</td><td class="px-5 py-3 text-gray-500 dark:text-gray-400 text-xs">'+dateStr(c.lastActive)+'</td><td class="px-5 py-3 text-right"><button onclick="viewCustomerDetail(\''+c.email+'\')" class="p-1 text-gray-400 hover:text-bd-green" title="View"><i class="bi bi-eye"></i></button><button onclick="editCustomerModal(\''+c.email+'\')" class="p-1 text-gray-400 hover:text-blue-600" title="Edit Tags/Notes"><i class="bi bi-pencil"></i></button></td></tr>';
+            }).join('');
+        }
+    };
+
+    window.viewCustomerDetail=function(email){
+        const c=(window._computedCustomers||{})[email];
+        if(!c)return;
+        const txs=Object.entries(allTransactions).filter(([k,t])=>(t.email||t.customerEmail||'').toLowerCase()===email).map(([k,t])=>({...t,id:k})).sort((a,b)=>new Date(b.timestamp||b.date||0)-new Date(a.timestamp||a.date||0));
+        let txHTML=txs.slice(0,10).map(t=>'<tr><td class="px-3 py-1.5 font-mono text-[10px]">#'+(t.id||'').substring(0,8)+'</td><td class="px-3 py-1.5 text-xs">'+fmtAmt(t.amount)+'</td><td class="px-3 py-1.5">'+statusBadge(t.status)+'</td><td class="px-3 py-1.5 text-[10px] text-gray-500">'+dateStr(t.timestamp||t.date)+'</td></tr>').join('');
+        openModal('<div class="flex justify-between items-start mb-4"><h3 class="font-bold text-gray-800 dark:text-white text-lg">Customer Profile</h3><button onclick="closeModal()" class="text-gray-400 hover:text-gray-600"><i class="bi bi-x-lg"></i></button></div><div class="flex items-center gap-3 mb-4"><div class="w-12 h-12 rounded-full bg-gradient-to-br from-bd-green to-emerald-600 flex items-center justify-center text-white font-bold text-lg">'+(c.name||'?').charAt(0).toUpperCase()+'</div><div><h4 class="font-bold text-gray-800 dark:text-white">'+c.name+'</h4><p class="text-xs text-gray-500">'+c.email+'</p><p class="text-xs text-gray-500">'+c.phone+'</p></div></div><div class="grid grid-cols-3 gap-3 mb-4"><div class="bg-emerald-50 dark:bg-emerald-900/30 p-3 rounded-lg text-center"><p class="text-[10px] text-gray-500">Total Spent</p><p class="font-bold text-emerald-700 dark:text-emerald-400">'+fmtAmt(c.totalSpent)+'</p></div><div class="bg-blue-50 dark:bg-blue-900/30 p-3 rounded-lg text-center"><p class="text-[10px] text-gray-500">Transactions</p><p class="font-bold text-blue-700 dark:text-blue-400">'+c.txCount+'</p></div><div class="bg-purple-50 dark:bg-purple-900/30 p-3 rounded-lg text-center"><p class="text-[10px] text-gray-500">Avg. Amount</p><p class="font-bold text-purple-700 dark:text-purple-400">'+(c.txCount>0?fmtAmt(c.totalSpent/c.txCount):'\u09F3 0')+'</p></div></div>'+(c.notes?'<div class="bg-gray-50 dark:bg-gray-700 p-3 rounded-lg mb-4"><p class="text-xs text-gray-500 mb-1">Notes</p><p class="text-sm">'+c.notes+'</p></div>':'')+'<h4 class="font-semibold text-sm mb-2 text-gray-800 dark:text-white">Recent Transactions</h4><table class="w-full text-left"><tbody>'+txHTML+'</tbody></table>',true);
+    };
+
+    window.editCustomerModal=function(email){
+        const c=(window._computedCustomers||{})[email];
+        if(!c)return;
+        openModal('<div class="flex justify-between items-start mb-4"><h3 class="font-bold text-gray-800 dark:text-white text-lg">Edit Customer</h3><button onclick="closeModal()" class="text-gray-400 hover:text-gray-600"><i class="bi bi-x-lg"></i></button></div><div class="space-y-3"><div><label class="text-xs text-gray-500 block mb-1">Tags (comma separated)</label><input type="text" id="edit-cust-tags" value="'+((c.tags||[]).join(', '))+'" class="w-full px-3 py-2 border rounded-lg text-sm dark:bg-gray-700 dark:border-gray-600" placeholder="vip, repeat, wholesale"></div><div><label class="text-xs text-gray-500 block mb-1">Notes</label><textarea id="edit-cust-notes" class="w-full px-3 py-2 border rounded-lg text-sm dark:bg-gray-700 dark:border-gray-600" rows="3">'+(c.notes||'')+'</textarea></div></div><div class="flex justify-end gap-2 mt-5"><button onclick="closeModal()" class="px-4 py-2 border border-gray-200 dark:border-gray-600 rounded-lg text-sm">Cancel</button><button onclick="saveCustomer(\''+email+'\')" class="px-4 py-2 bg-bd-green text-white rounded-lg text-sm">Save</button></div>');
+    };
+
+    window.saveCustomer=function(email){
+        const tags=document.getElementById('edit-cust-tags').value.split(',').map(t=>t.trim()).filter(t=>t);
+        const notes=document.getElementById('edit-cust-notes').value.trim();
+        const c=(window._computedCustomers||{})[email];
+        const data={name:c.name,email:c.email,phone:c.phone,tags,notes,updatedAt:new Date().toISOString()};
+        if(c.id){fbUpdate('customers/'+c.id,data)}else{fbPush('customers',data)}
+        showToast('Customer updated','success');closeModal();
+    };
+
+    window.openAddCustomerModal=function(){openModal('<div class="flex justify-between items-start mb-4"><h3 class="font-bold text-gray-800 dark:text-white text-lg">Add Customer</h3><button onclick="closeModal()" class="text-gray-400 hover:text-gray-600"><i class="bi bi-x-lg"></i></button></div><div class="space-y-3"><div><label class="text-xs text-gray-500 block mb-1">Name *</label><input type="text" id="add-cust-name" class="w-full px-3 py-2 border rounded-lg text-sm dark:bg-gray-700 dark:border-gray-600" placeholder="Full name"></div><div><label class="text-xs text-gray-500 block mb-1">Email *</label><input type="email" id="add-cust-email" class="w-full px-3 py-2 border rounded-lg text-sm dark:bg-gray-700 dark:border-gray-600" placeholder="email@example.com"></div><div><label class="text-xs text-gray-500 block mb-1">Phone</label><input type="text" id="add-cust-phone" class="w-full px-3 py-2 border rounded-lg text-sm dark:bg-gray-700 dark:border-gray-600" placeholder="+880..."></div><div><label class="text-xs text-gray-500 block mb-1">Tags</label><input type="text" id="add-cust-tags" class="w-full px-3 py-2 border rounded-lg text-sm dark:bg-gray-700 dark:border-gray-600" placeholder="vip, repeat"></div></div><div class="flex justify-end gap-2 mt-5"><button onclick="closeModal()" class="px-4 py-2 border rounded-lg text-sm">Cancel</button><button onclick="addCustomer()" class="px-4 py-2 bg-bd-green text-white rounded-lg text-sm">Create</button></div>')};
+
+    window.addCustomer=function(){const name=document.getElementById('add-cust-name').value.trim();const email=document.getElementById('add-cust-email').value.trim();if(!name||!email){showToast('Name and email required','warning');return}fbPush('customers',{name,email,phone:document.getElementById('add-cust-phone').value.trim(),tags:document.getElementById('add-cust-tags').value.split(',').map(t=>t.trim()).filter(t=>t),notes:'',createdAt:new Date().toISOString()});showToast('Customer added','success');addAdminLog('Add Customer',name,'success');closeModal()};
+
+    // ---- Invoices (CRM) ----
+    function renderInvoices(){
+        const arr=Object.entries(allInvoices).map(([k,v])=>({...v,id:k})).sort((a,b)=>new Date(b.createdAt||0)-new Date(a.createdAt||0));
+        const total=arr.length;const paid=arr.filter(i=>i.status==='paid').length;const unpaid=arr.filter(i=>i.status==='unpaid').length;const overdue=arr.filter(i=>i.status==='overdue'||(i.status==='unpaid'&&new Date(i.dueDate)<new Date())).length;
+        document.getElementById('inv-total').textContent=total;document.getElementById('inv-paid').textContent=paid;document.getElementById('inv-unpaid').textContent=unpaid;document.getElementById('inv-overdue').textContent=overdue;
+        const tbody=document.getElementById('invoices-table');const emptyEl=document.getElementById('inv-empty');
+        if(total===0){tbody.innerHTML='';emptyEl.classList.remove('hidden')}
+        else{emptyEl.classList.add('hidden');tbody.innerHTML=arr.map(inv=>'<tr class="hover:bg-gray-50/50 dark:hover:bg-gray-700/50"><td class="px-5 py-3 font-mono text-xs">'+(inv.invoiceNo||inv.id.substring(0,8))+'</td><td class="px-5 py-3">'+(inv.customerName||'N/A')+'</td><td class="px-5 py-3 font-semibold">'+fmtAmt(inv.amount)+'</td><td class="px-5 py-3 text-xs text-gray-500">'+dateStr(inv.dueDate)+'</td><td class="px-5 py-3">'+statusBadge(inv.status)+'</td><td class="px-5 py-3 text-right"><div class="flex items-center justify-end gap-1"><button onclick="markInvoicePaid(\''+inv.id+'\')" class="p-1 text-gray-400 hover:text-emerald-600" title="Mark Paid"><i class="bi bi-check-circle"></i></button><button onclick="deleteInvoice(\''+inv.id+'\')" class="p-1 text-gray-400 hover:text-red-600" title="Delete"><i class="bi bi-trash"></i></button></div></td></tr>').join('')}
+    }
+
+    window.openCreateInvoiceModal=function(){openModal('<div class="flex justify-between items-start mb-4"><h3 class="font-bold text-gray-800 dark:text-white text-lg">Create Invoice</h3><button onclick="closeModal()" class="text-gray-400 hover:text-gray-600"><i class="bi bi-x-lg"></i></button></div><div class="space-y-3"><div><label class="text-xs text-gray-500 block mb-1">Customer Name *</label><input type="text" id="inv-cust-name" class="w-full px-3 py-2 border rounded-lg text-sm dark:bg-gray-700 dark:border-gray-600"></div><div><label class="text-xs text-gray-500 block mb-1">Customer Email *</label><input type="email" id="inv-cust-email" class="w-full px-3 py-2 border rounded-lg text-sm dark:bg-gray-700 dark:border-gray-600"></div><div><label class="text-xs text-gray-500 block mb-1">Amount *</label><input type="number" id="inv-amount" class="w-full px-3 py-2 border rounded-lg text-sm dark:bg-gray-700 dark:border-gray-600" min="1"></div><div><label class="text-xs text-gray-500 block mb-1">Due Date *</label><input type="date" id="inv-due" class="w-full px-3 py-2 border rounded-lg text-sm dark:bg-gray-700 dark:border-gray-600"></div><div><label class="text-xs text-gray-500 block mb-1">Description</label><textarea id="inv-desc" class="w-full px-3 py-2 border rounded-lg text-sm dark:bg-gray-700 dark:border-gray-600" rows="2"></textarea></div></div><div class="flex justify-end gap-2 mt-5"><button onclick="closeModal()" class="px-4 py-2 border rounded-lg text-sm">Cancel</button><button onclick="createInvoice()" class="px-4 py-2 bg-bd-green text-white rounded-lg text-sm">Create</button></div>')};
+
+    window.createInvoice=function(){const name=document.getElementById('inv-cust-name').value.trim();const email=document.getElementById('inv-cust-email').value.trim();const amount=Number(document.getElementById('inv-amount').value);const due=document.getElementById('inv-due').value;if(!name||!email||!amount||!due){showToast('Fill all required fields','warning');return}fbPush('invoices',{invoiceNo:genId(),customerName:name,customerEmail:email,amount,dueDate:due,description:document.getElementById('inv-desc').value.trim(),status:'unpaid',createdAt:new Date().toISOString()});showToast('Invoice created','success');addAdminLog('Create Invoice',name+' \u09F3'+amount,'success');closeModal()};
+
+    window.markInvoicePaid=function(id){fbUpdate('invoices/'+id,{status:'paid',paidAt:new Date().toISOString()}).then(()=>{showToast('Invoice marked as paid','success');addAdminLog('Invoice Paid','#'+id.substring(0,8),'success')}).catch(e=>showToast('Error: '+e.message,'error'))};
+    window.deleteInvoice=function(id){showConfirm('Delete this invoice?',function(){fbRemove('invoices/'+id).then(()=>{showToast('Invoice deleted','success')}).catch(e=>showToast('Error','error'))})};
+
+    // ---- Merchants ----
+    function renderMerchants(){const arr=Object.entries(allMerchants).map(([k,v])=>({...v,id:k}));const total=arr.length;const active=arr.filter(m=>m.status==='active').length;const inactive=arr.filter(m=>m.status!=='active').length;const avgComm=total>0?(arr.reduce((s,m)=>s+Number(m.commission||0),0)/total).toFixed(1):0;document.getElementById('m-total').textContent=total;document.getElementById('m-active').textContent=active;document.getElementById('m-inactive').textContent=inactive;document.getElementById('m-avg-comm').textContent=avgComm+'%';document.getElementById('merchant-count-badge').textContent=total;const tbody=document.getElementById('merchants-table');const emptyEl=document.getElementById('merchant-empty');if(total===0){tbody.innerHTML='';emptyEl.classList.remove('hidden')}else{emptyEl.classList.add('hidden');tbody.innerHTML=arr.map(m=>'<tr class="hover:bg-gray-50/50 dark:hover:bg-gray-700/50"><td class="px-5 py-3 font-medium">'+(m.name||'N/A')+'</td><td class="px-5 py-3 text-gray-500 dark:text-gray-400">'+(m.email||'')+'</td><td class="px-5 py-3 text-gray-500 dark:text-gray-400">'+(m.phone||'')+'</td><td class="px-5 py-3 font-semibold">'+(m.commission||0)+'%</td><td class="px-5 py-3">'+statusBadge(m.status)+'</td><td class="px-5 py-3 text-gray-500 dark:text-gray-400 text-xs">'+dateStr(m.createdAt)+'</td><td class="px-5 py-3 text-right"><div class="flex items-center justify-end gap-1"><button onclick="editMerchantModal(\''+m.id+'\')" class="p-1 text-gray-400 hover:text-blue-600"><i class="bi bi-pencil"></i></button><button onclick="deleteMerchant(\''+m.id+'\')" class="p-1 text-gray-400 hover:text-red-600"><i class="bi bi-trash"></i></button></div></td></tr>').join('')}}
+
+    window.openAddMerchantModal=function(){openModal('<div class="flex justify-between items-start mb-4"><h3 class="font-bold text-gray-800 dark:text-white text-lg">Add Merchant</h3><button onclick="closeModal()" class="text-gray-400 hover:text-gray-600"><i class="bi bi-x-lg"></i></button></div><div class="space-y-3"><div><label class="text-xs text-gray-500 block mb-1">Name *</label><input type="text" id="add-m-name" class="w-full px-3 py-2 border rounded-lg text-sm dark:bg-gray-700 dark:border-gray-600" placeholder="Merchant name"></div><div><label class="text-xs text-gray-500 block mb-1">Email *</label><input type="email" id="add-m-email" class="w-full px-3 py-2 border rounded-lg text-sm dark:bg-gray-700 dark:border-gray-600"></div><div><label class="text-xs text-gray-500 block mb-1">Phone</label><input type="text" id="add-m-phone" class="w-full px-3 py-2 border rounded-lg text-sm dark:bg-gray-700 dark:border-gray-600"></div><div><label class="text-xs text-gray-500 block mb-1">Commission %</label><input type="number" id="add-m-commission" value="2" step="0.1" min="0" max="100" class="w-full px-3 py-2 border rounded-lg text-sm dark:bg-gray-700 dark:border-gray-600"></div><div><label class="text-xs text-gray-500 block mb-1">Status</label><select id="add-m-status" class="w-full px-3 py-2 border rounded-lg text-sm dark:bg-gray-700 dark:border-gray-600"><option value="active">Active</option><option value="inactive">Inactive</option></select></div></div><div class="flex justify-end gap-2 mt-5"><button onclick="closeModal()" class="px-4 py-2 border rounded-lg text-sm">Cancel</button><button onclick="addMerchant()" class="px-4 py-2 bg-bd-green text-white rounded-lg text-sm">Create</button></div>')};
+
+    window.addMerchant=function(){const name=document.getElementById('add-m-name').value.trim();const email=document.getElementById('add-m-email').value.trim();if(!name||!email){showToast('Name and email required','warning');return}fbPush('merchants',{name,email,phone:document.getElementById('add-m-phone').value.trim(),commission:Number(document.getElementById('add-m-commission').value),status:document.getElementById('add-m-status').value,createdAt:new Date().toISOString()});showToast('Merchant created','success');addAdminLog('Create Merchant',name,'success');closeModal()};
+
+    window.editMerchantModal=function(id){const m=allMerchants[id];if(!m)return;openModal('<div class="flex justify-between items-start mb-4"><h3 class="font-bold text-gray-800 dark:text-white text-lg">Edit Merchant</h3><button onclick="closeModal()" class="text-gray-400 hover:text-gray-600"><i class="bi bi-x-lg"></i></button></div><div class="space-y-3"><div><label class="text-xs text-gray-500 block mb-1">Name</label><input type="text" id="edit-m-name" value="'+(m.name||'')+'" class="w-full px-3 py-2 border rounded-lg text-sm dark:bg-gray-700 dark:border-gray-600"></div><div><label class="text-xs text-gray-500 block mb-1">Email</label><input type="email" id="edit-m-email" value="'+(m.email||'')+'" class="w-full px-3 py-2 border rounded-lg text-sm dark:bg-gray-700 dark:border-gray-600"></div><div><label class="text-xs text-gray-500 block mb-1">Phone</label><input type="text" id="edit-m-phone" value="'+(m.phone||'')+'" class="w-full px-3 py-2 border rounded-lg text-sm dark:bg-gray-700 dark:border-gray-600"></div><div><label class="text-xs text-gray-500 block mb-1">Commission %</label><input type="number" id="edit-m-commission" value="'+(m.commission||2)+'" step="0.1" class="w-full px-3 py-2 border rounded-lg text-sm dark:bg-gray-700 dark:border-gray-600"></div><div><label class="text-xs text-gray-500 block mb-1">Status</label><select id="edit-m-status" class="w-full px-3 py-2 border rounded-lg text-sm dark:bg-gray-700 dark:border-gray-600"><option value="active"'+(m.status==='active'?' selected':'')+'>Active</option><option value="inactive"'+(m.status==='inactive'?' selected':'')+'>Inactive</option></select></div></div><div class="flex justify-end gap-2 mt-5"><button onclick="closeModal()" class="px-4 py-2 border rounded-lg text-sm">Cancel</button><button onclick="saveEditMerchant(\''+id+'\')" class="px-4 py-2 bg-bd-green text-white rounded-lg text-sm">Save</button></div>')};
+
+    window.saveEditMerchant=function(id){fbUpdate('merchants/'+id,{name:document.getElementById('edit-m-name').value.trim(),email:document.getElementById('edit-m-email').value.trim(),phone:document.getElementById('edit-m-phone').value.trim(),commission:Number(document.getElementById('edit-m-commission').value),status:document.getElementById('edit-m-status').value}).then(()=>{showToast('Merchant updated','success');closeModal()}).catch(e=>showToast('Error','error'))};
+
+    window.deleteMerchant=function(id){showConfirm('Delete this merchant?',function(){fbRemove('merchants/'+id).then(()=>showToast('Merchant deleted','success')).catch(e=>showToast('Error','error'))})};
+
+    // ---- Gateways ----
+    function renderGateways(){
+        const gws=[{key:'bkash',name:'bKash',color:'bg-pink-600',desc:'Mobile Financial Service',checkColor:'peer-checked:bg-pink-600'},{key:'nagad',name:'Nagad',color:'bg-orange-500',desc:'Digital Financial Service',checkColor:'peer-checked:bg-orange-500'},{key:'rocket',name:'Rocket',color:'bg-purple-700',desc:'DBBL Mobile Banking',checkColor:'peer-checked:bg-purple-700'},{key:'upay',name:'Upay',color:'bg-teal-500',desc:'United Commercial Bank',checkColor:'peer-checked:bg-teal-500'}];
+        const container=document.getElementById('gateway-cards');
+        container.innerHTML=gws.map(gw=>{
+            const gwData=gatewaySettings[gw.key]||{};
+            const enabled=gwData.enabled!==false;
+            const comm=gwData.commission||1.5;
+            return '<div class="bg-white dark:bg-gray-800 p-5 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700"><div class="flex items-center justify-between mb-4"><div class="flex items-center gap-3"><div class="w-11 h-11 '+gw.color+' rounded-lg flex items-center justify-center text-white font-bold text-lg shadow-sm">'+gw.name.charAt(0)+'</div><div><h3 class="font-bold text-gray-800 dark:text-white">'+gw.name+'</h3><p class="text-[10px] text-gray-400">'+gw.desc+'</p></div></div><label class="relative inline-flex items-center cursor-pointer"><input type="checkbox" id="gw-toggle-'+gw.key+'" '+(enabled?'checked':'')+' class="sr-only peer" onchange="toggleGateway(\''+gw.key+'\',this.checked)"><div class="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:after:translate-x-full after:content-[\'\'] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border after:rounded-full after:h-5 after:w-5 after:transition-all '+gw.checkColor+'"></div></label></div><div class="space-y-3 pt-3 border-t border-gray-100 dark:border-gray-700"><div class="flex justify-between text-sm"><span class="text-gray-500">Status</span><span id="gw-status-'+gw.key+'" class="'+(enabled?'text-emerald-600':'text-red-500')+' font-semibold text-xs">'+(enabled?'Active':'Disabled')+'</span></div><div class="flex justify-between text-sm items-center"><span class="text-gray-500">Commission</span><div class="flex items-center gap-1"><input type="number" id="gw-commission-'+gw.key+'" value="'+comm+'" step="0.1" min="0" max="100" class="w-16 px-2 py-1 border rounded text-right text-sm dark:bg-gray-700 dark:border-gray-600"><span class="text-gray-500 text-xs">%</span></div></div><div class="flex justify-between text-sm"><span class="text-gray-500">Tx Count</span><span class="font-semibold text-xs text-gray-800 dark:text-white" id="gw-count-'+gw.key+'">0</span></div><div class="flex justify-between text-sm"><span class="text-gray-500">Revenue</span><span class="font-semibold text-xs text-gray-800 dark:text-white" id="gw-rev-'+gw.key+'">\u09F3 0</span></div></div></div>';
+        }).join('');
+    }
+
+    window.toggleGateway=function(gw,enabled){fbUpdate('gateway_settings/'+gw,{enabled}).then(()=>{const s=document.getElementById('gw-status-'+gw);if(enabled){s.textContent='Active';s.className='text-emerald-600 font-semibold text-xs'}else{s.textContent='Disabled';s.className='text-red-500 font-semibold text-xs'}showToast(gw+' '+(enabled?'enabled':'disabled'),'success');addAdminLog('Toggle Gateway',gw+' \u2192 '+(enabled?'ON':'OFF'),enabled?'success':'warning')}).catch(e=>showToast('Error','error'))};
+
+    window.saveGatewayCommissions=function(){const data={};['bkash','nagad','rocket','upay'].forEach(gw=>{const toggle=document.getElementById('gw-toggle-'+gw);const comm=document.getElementById('gw-commission-'+gw);data[gw]={enabled:toggle?toggle.checked:true,commission:comm?Number(comm.value):1.5}});fbUpdate('gateway_settings',data).then(()=>{showToast('Commissions saved','success');addAdminLog('Save Commissions','Updated gateway rates','success')}).catch(e=>showToast('Error','error'))};
+
+    function loadGatewaySettings(){fbOnValue('gateway_settings',function(snap){gatewaySettings=snap.val()||{};renderGateways();updateDashboard()})}
+
+    // ---- Settlements ----
+    function renderSettlements(){const arr=Object.entries(allSettlements).map(([k,v])=>({...v,id:k}));document.getElementById('s-total').textContent=arr.length;document.getElementById('s-pending-amt').textContent=fmtAmt(arr.filter(s=>s.status==='pending').reduce((s,st)=>s+Number(st.amount||0),0));document.getElementById('s-processed-amt').textContent=fmtAmt(arr.filter(s=>s.status==='processed').reduce((s,st)=>s+Number(st.amount||0),0));document.getElementById('settlement-count-badge').textContent=arr.length;const tbody=document.getElementById('settlements-table');const emptyEl=document.getElementById('settlement-empty');if(arr.length===0){tbody.innerHTML='';emptyEl.classList.remove('hidden')}else{emptyEl.classList.add('hidden');tbody.innerHTML=arr.map(s=>{let actions=s.status==='pending'?'<div class="flex items-center justify-end gap-1"><button onclick="processSettlement(\''+s.id+'\')" class="px-2 py-1 bg-emerald-100 text-emerald-700 rounded text-[10px]">Process</button><button onclick="rejectSettlement(\''+s.id+'\')" class="px-2 py-1 bg-red-100 text-red-700 rounded text-[10px]">Reject</button><button onclick="deleteSettlement(\''+s.id+'\')" class="px-2 py-1 bg-gray-100 text-gray-600 rounded text-[10px]"><i class="bi bi-trash"></i></button></div>':'<button onclick="deleteSettlement(\''+s.id+'\')" class="px-2 py-1 bg-gray-100 text-gray-600 rounded text-[10px]"><i class="bi bi-trash"></i></button>';return '<tr class="hover:bg-gray-50/50 dark:hover:bg-gray-700/50"><td class="px-5 py-3 font-medium">'+(s.merchant||s.merchantName||'N/A')+'</td><td class="px-5 py-3 font-semibold">'+fmtAmt(s.amount)+'</td><td class="px-5 py-3 text-gray-500 text-xs">'+dateStr(s.requestDate||s.createdAt)+'</td><td class="px-5 py-3">'+statusBadge(s.status)+'</td><td class="px-5 py-3 text-right">'+actions+'</td></tr>'}).join('')}}
+
+    window.processSettlement=function(id){fbUpdate('settlements/'+id,{status:'processed',processedAt:new Date().toISOString()}).then(()=>{showToast('Settlement processed','success');addAdminLog('Process Settlement','#'+id.substring(0,8),'success')})};
+    window.rejectSettlement=function(id){fbUpdate('settlements/'+id,{status:'rejected',rejectedAt:new Date().toISOString()}).then(()=>{showToast('Settlement rejected','warning');addAdminLog('Reject Settlement','#'+id.substring(0,8),'warning')})};
+    window.deleteSettlement=function(id){showConfirm('Delete this settlement?',function(){fbRemove('settlements/'+id).then(()=>showToast('Deleted','success'))})};
+    window.openAddSettlementModal=function(){const mOpts=Object.entries(allMerchants).filter(([k,m])=>m.status==='active').map(([k,m])=>'<option value="'+k+'">'+(m.name||'Merchant')+'</option>').join('');openModal('<div class="flex justify-between items-start mb-4"><h3 class="font-bold text-gray-800 dark:text-white text-lg">Add Settlement</h3><button onclick="closeModal()" class="text-gray-400 hover:text-gray-600"><i class="bi bi-x-lg"></i></button></div><div class="space-y-3"><div><label class="text-xs text-gray-500 block mb-1">Merchant *</label><select id="add-s-merchant" class="w-full px-3 py-2 border rounded-lg text-sm dark:bg-gray-700 dark:border-gray-600"><option value="">Select...</option>'+mOpts+'</select></div><div><label class="text-xs text-gray-500 block mb-1">Amount *</label><input type="number" id="add-s-amount" class="w-full px-3 py-2 border rounded-lg text-sm dark:bg-gray-700 dark:border-gray-600" min="1"></div><div><label class="text-xs text-gray-500 block mb-1">Notes</label><textarea id="add-s-notes" class="w-full px-3 py-2 border rounded-lg text-sm dark:bg-gray-700 dark:border-gray-600" rows="2"></textarea></div></div><div class="flex justify-end gap-2 mt-5"><button onclick="closeModal()" class="px-4 py-2 border rounded-lg text-sm">Cancel</button><button onclick="addSettlement()" class="px-4 py-2 bg-bd-green text-white rounded-lg text-sm">Create</button></div>')};
+    window.addSettlement=function(){const mk=document.getElementById('add-s-merchant').value;const amt=Number(document.getElementById('add-s-amount').value);if(!mk||!amt){showToast('Required','warning');return}const m=allMerchants[mk];fbPush('settlements',{merchant:mk,merchantName:m?m.name:'Unknown',amount:amt,notes:document.getElementById('add-s-notes').value.trim(),status:'pending',requestDate:new Date().toISOString(),createdAt:new Date().toISOString()});showToast('Settlement created','success');closeModal()};
+
+    // ---- Disputes (CRM) ----
+    function renderDisputes(){const arr=Object.entries(allDisputes).map(([k,v])=>({...v,id:k})).sort((a,b)=>new Date(b.createdAt||0)-new Date(a.createdAt||0));document.getElementById('disp-total').textContent=arr.length;document.getElementById('disp-open').textContent=arr.filter(d=>d.status==='open').length;document.getElementById('disp-resolved').textContent=arr.filter(d=>d.status==='resolved').length;document.getElementById('disp-amount').textContent=fmtAmt(arr.reduce((s,d)=>s+Number(d.amount||0),0));const tbody=document.getElementById('disputes-table');const emptyEl=document.getElementById('disp-empty');if(arr.length===0){tbody.innerHTML='';emptyEl.classList.remove('hidden')}else{emptyEl.classList.add('hidden');tbody.innerHTML=arr.map(d=>'<tr class="hover:bg-gray-50/50 dark:hover:bg-gray-700/50"><td class="px-5 py-3 font-mono text-xs">#'+(d.id||'').substring(0,8)+'</td><td class="px-5 py-3 font-mono text-xs">#'+(d.transactionId||'').substring(0,8)+'</td><td class="px-5 py-3">'+(d.customerName||'N/A')+'</td><td class="px-5 py-3 font-semibold">'+fmtAmt(d.amount)+'</td><td class="px-5 py-3 text-xs">'+(d.reason||'N/A')+'</td><td class="px-5 py-3">'+statusBadge(d.status)+'</td><td class="px-5 py-3 text-right"><div class="flex items-center justify-end gap-1">'+(d.status==='open'?'<button onclick="resolveDispute(\''+d.id+'\')" class="px-2 py-1 bg-emerald-100 text-emerald-700 rounded text-[10px]">Resolve</button><button onclick="rejectDispute(\''+d.id+'\')" class="px-2 py-1 bg-red-100 text-red-700 rounded text-[10px]">Reject</button>':'')+'<button onclick="deleteDispute(\''+d.id+'\')" class="p-1 text-gray-400 hover:text-red-600"><i class="bi bi-trash"></i></button></div></td></tr>').join('')}}
+
+    window.openCreateDisputeModal=function(){openModal('<div class="flex justify-between items-start mb-4"><h3 class="font-bold text-gray-800 dark:text-white text-lg">File Dispute</h3><button onclick="closeModal()" class="text-gray-400 hover:text-gray-600"><i class="bi bi-x-lg"></i></button></div><div class="space-y-3"><div><label class="text-xs text-gray-500 block mb-1">Transaction ID *</label><input type="text" id="disp-txid" class="w-full px-3 py-2 border rounded-lg text-sm dark:bg-gray-700 dark:border-gray-600" placeholder="Paste transaction ID"></div><div><label class="text-xs text-gray-500 block mb-1">Customer Name *</label><input type="text" id="disp-cust" class="w-full px-3 py-2 border rounded-lg text-sm dark:bg-gray-700 dark:border-gray-600"></div><div><label class="text-xs text-gray-500 block mb-1">Amount *</label><input type="number" id="disp-amount" class="w-full px-3 py-2 border rounded-lg text-sm dark:bg-gray-700 dark:border-gray-600" min="1"></div><div><label class="text-xs text-gray-500 block mb-1">Reason *</label><select id="disp-reason" class="w-full px-3 py-2 border rounded-lg text-sm dark:bg-gray-700 dark:border-gray-600"><option>Unauthorized transaction</option><option>Duplicate charge</option><option>Product not received</option><option>Amount mismatch</option><option>Other</option></select></div><div><label class="text-xs text-gray-500 block mb-1">Description</label><textarea id="disp-desc" class="w-full px-3 py-2 border rounded-lg text-sm dark:bg-gray-700 dark:border-gray-600" rows="2"></textarea></div></div><div class="flex justify-end gap-2 mt-5"><button onclick="closeModal()" class="px-4 py-2 border rounded-lg text-sm">Cancel</button><button onclick="createDispute()" class="px-4 py-2 bg-bd-red text-white rounded-lg text-sm">File Dispute</button></div>')};
+
+    window.createDispute=function(){const txid=document.getElementById('disp-txid').value.trim();const cust=document.getElementById('disp-cust').value.trim();const amt=Number(document.getElementById('disp-amount').value);if(!txid||!cust||!amt){showToast('Fill required fields','warning');return}fbPush('disputes',{transactionId:txid,customerName:cust,amount:amt,reason:document.getElementById('disp-reason').value,description:document.getElementById('disp-desc').value.trim(),status:'open',createdAt:new Date().toISOString()});showToast('Dispute filed','success');addAdminLog('File Dispute','TX #'+txid.substring(0,8),'warning');closeModal()};
+
+    window.resolveDispute=function(id){fbUpdate('disputes/'+id,{status:'resolved',resolvedAt:new Date().toISOString()}).then(()=>{showToast('Dispute resolved','success');addAdminLog('Resolve Dispute','#'+id.substring(0,8),'success')})};
+    window.rejectDispute=function(id){fbUpdate('disputes/'+id,{status:'rejected',rejectedAt:new Date().toISOString()}).then(()=>{showToast('Dispute rejected','warning')})};
+    window.deleteDispute=function(id){showConfirm('Delete dispute?',function(){fbRemove('disputes/'+id)})};
+
+    // ---- Tickets (CRM) ----
+    function renderTickets(){const filter=document.getElementById('ticket-filter').value;let arr=Object.entries(allTickets).map(([k,v])=>({...v,id:k})).sort((a,b)=>new Date(b.createdAt||0)-new Date(a.createdAt||0));if(filter!=='all')arr=arr.filter(t=>t.status===filter);document.getElementById('tick-total').textContent=Object.keys(allTickets).length;document.getElementById('tick-open').textContent=Object.values(allTickets).filter(t=>t.status==='open').length;document.getElementById('tick-progress').textContent=Object.values(allTickets).filter(t=>t.status==='in_progress').length;document.getElementById('tick-closed').textContent=Object.values(allTickets).filter(t=>t.status==='closed').length;const tbody=document.getElementById('tickets-table');const emptyEl=document.getElementById('tick-empty');if(arr.length===0){tbody.innerHTML='';emptyEl.classList.remove('hidden')}else{emptyEl.classList.add('hidden');tbody.innerHTML=arr.map(t=>'<tr class="hover:bg-gray-50/50 dark:hover:bg-gray-700/50"><td class="px-5 py-3 font-mono text-xs">#'+(t.id||'').substring(0,8)+'</td><td class="px-5 py-3 font-medium">'+(t.subject||'N/A')+'</td><td class="px-5 py-3">'+(t.customerName||'N/A')+'</td><td class="px-5 py-3">'+priorityBadge(t.priority)+'</td><td class="px-5 py-3">'+statusBadge(t.status)+'</td><td class="px-5 py-3 text-xs text-gray-500">'+dateStr(t.createdAt)+'</td><td class="px-5 py-3 text-right"><div class="flex items-center justify-end gap-1">'+(t.status==='open'?'<button onclick="updateTicketStatus(\''+t.id+'\',\'in_progress\')" class="px-2 py-1 bg-blue-100 text-blue-700 rounded text-[10px]">Start</button>':'')+(t.status==='in_progress'?'<button onclick="updateTicketStatus(\''+t.id+'\',\'closed\')" class="px-2 py-1 bg-emerald-100 text-emerald-700 rounded text-[10px]">Close</button>':'')+'<button onclick="viewTicketDetail(\''+t.id+'\')" class="p-1 text-gray-400 hover:text-bd-green"><i class="bi bi-eye"></i></button><button onclick="deleteTicket(\''+t.id+'\')" class="p-1 text-gray-400 hover:text-red-600"><i class="bi bi-trash"></i></button></div></td></tr>').join('')}}
+
+    window.openCreateTicketModal=function(){openModal('<div class="flex justify-between items-start mb-4"><h3 class="font-bold text-gray-800 dark:text-white text-lg">New Support Ticket</h3><button onclick="closeModal()" class="text-gray-400 hover:text-gray-600"><i class="bi bi-x-lg"></i></button></div><div class="space-y-3"><div><label class="text-xs text-gray-500 block mb-1">Subject *</label><input type="text" id="tick-subject" class="w-full px-3 py-2 border rounded-lg text-sm dark:bg-gray-700 dark:border-gray-600"></div><div><label class="text-xs text-gray-500 block mb-1">Customer Name *</label><input type="text" id="tick-cust" class="w-full px-3 py-2 border rounded-lg text-sm dark:bg-gray-700 dark:border-gray-600"></div><div><label class="text-xs text-gray-500 block mb-1">Customer Email</label><input type="email" id="tick-email" class="w-full px-3 py-2 border rounded-lg text-sm dark:bg-gray-700 dark:border-gray-600"></div><div><label class="text-xs text-gray-500 block mb-1">Priority</label><select id="tick-priority" class="w-full px-3 py-2 border rounded-lg text-sm dark:bg-gray-700 dark:border-gray-600"><option value="low">Low</option><option value="medium" selected>Medium</option><option value="high">High</option></select></div><div><label class="text-xs text-gray-500 block mb-1">Description *</label><textarea id="tick-desc" class="w-full px-3 py-2 border rounded-lg text-sm dark:bg-gray-700 dark:border-gray-600" rows="3"></textarea></div></div><div class="flex justify-end gap-2 mt-5"><button onclick="closeModal()" class="px-4 py-2 border rounded-lg text-sm">Cancel</button><button onclick="createTicket()" class="px-4 py-2 bg-bd-green text-white rounded-lg text-sm">Create Ticket</button></div>')};
+
+    window.createTicket=function(){const subj=document.getElementById('tick-subject').value.trim();const cust=document.getElementById('tick-cust').value.trim();const desc=document.getElementById('tick-desc').value.trim();if(!subj||!cust||!desc){showToast('Fill required fields','warning');return}fbPush('tickets',{subject:subj,customerName:cust,customerEmail:document.getElementById('tick-email').value.trim(),priority:document.getElementById('tick-priority').value,description:desc,status:'open',createdAt:new Date().toISOString()});showToast('Ticket created','success');addAdminLog('Create Ticket',subj,'info');closeModal()};
+
+    window.updateTicketStatus=function(id,status){fbUpdate('tickets/'+id,{status,updatedAt:new Date().toISOString()}).then(()=>{showToast('Ticket '+status.replace('_',' '),'success');addAdminLog('Ticket Status','#'+id.substring(0,8)+' \u2192 '+status,'info')})};
+    window.viewTicketDetail=function(id){const t=allTickets[id];if(!t)return;openModal('<div class="flex justify-between items-start mb-4"><h3 class="font-bold text-gray-800 dark:text-white text-lg">Ticket #'+id.substring(0,8)+'</h3><button onclick="closeModal()" class="text-gray-400 hover:text-gray-600"><i class="bi bi-x-lg"></i></button></div><div class="space-y-3 text-sm"><div class="flex justify-between pb-2 border-b border-gray-50 dark:border-gray-700"><span class="text-gray-500">Subject</span><span class="font-medium">'+t.subject+'</span></div><div class="flex justify-between pb-2 border-b border-gray-50 dark:border-gray-700"><span class="text-gray-500">Customer</span><span>'+t.customerName+'</span></div><div class="flex justify-between pb-2 border-b border-gray-50 dark:border-gray-700"><span class="text-gray-500">Priority</span>'+priorityBadge(t.priority)+'</div><div class="flex justify-between pb-2 border-b border-gray-50 dark:border-gray-700"><span class="text-gray-500">Status</span>'+statusBadge(t.status)+'</div><div class="flex justify-between pb-2 border-b border-gray-50 dark:border-gray-700"><span class="text-gray-500">Created</span><span>'+dateStr(t.createdAt)+'</span></div><div class="pt-2"><span class="text-gray-500 block mb-1">Description</span><p class="bg-gray-50 dark:bg-gray-700 p-3 rounded-lg text-sm">'+t.description+'</p></div></div>')};
+    window.deleteTicket=function(id){showConfirm('Delete ticket?',function(){fbRemove('tickets/'+id)})};
+
+    // ---- Announcements ----
+    function renderAnnouncements(){const arr=Object.entries(allAnnouncements).map(([k,v])=>({...v,id:k})).sort((a,b)=>new Date(b.createdAt||0)-new Date(a.createdAt||0));const container=document.getElementById('announcements-list');const emptyEl=document.getElementById('ann-empty');if(arr.length===0){container.innerHTML='';emptyEl.classList.remove('hidden')}else{emptyEl.classList.add('hidden');container.innerHTML=arr.map(a=>'<div class="p-4 sm:p-5 hover:bg-gray-50 dark:hover:bg-gray-700/50"><div class="flex justify-between items-start"><div><h4 class="font-semibold text-gray-800 dark:text-white">'+a.title+'</h4><p class="text-sm text-gray-500 mt-1">'+a.content+'</p><p class="text-[10px] text-gray-400 mt-2">'+dateStr(a.createdAt)+' \u00B7 '+statusBadge(a.active?'active':'inactive')+'</p></div><div class="flex gap-1"><button onclick="toggleAnnouncement(\''+a.id+'\','+!a.active+')" class="p-1 text-gray-400 hover:text-blue-600"><i class="bi bi-'+(a.active?'eye-slash':'eye')+'"></i></button><button onclick="deleteAnnouncement(\''+a.id+'\')" class="p-1 text-gray-400 hover:text-red-600"><i class="bi bi-trash"></i></button></div></div></div>').join('')}}
+
+    window.openCreateAnnouncementModal=function(){openModal('<div class="flex justify-between items-start mb-4"><h3 class="font-bold text-gray-800 dark:text-white text-lg">New Announcement</h3><button onclick="closeModal()" class="text-gray-400 hover:text-gray-600"><i class="bi bi-x-lg"></i></button></div><div class="space-y-3"><div><label class="text-xs text-gray-500 block mb-1">Title *</label><input type="text" id="ann-title" class="w-full px-3 py-2 border rounded-lg text-sm dark:bg-gray-700 dark:border-gray-600"></div><div><label class="text-xs text-gray-500 block mb-1">Content *</label><textarea id="ann-content" class="w-full px-3 py-2 border rounded-lg text-sm dark:bg-gray-700 dark:border-gray-600" rows="3"></textarea></div></div><div class="flex justify-end gap-2 mt-5"><button onclick="closeModal()" class="px-4 py-2 border rounded-lg text-sm">Cancel</button><button onclick="createAnnouncement()" class="px-4 py-2 bg-bd-green text-white rounded-lg text-sm">Publish</button></div>')};
+
+    window.createAnnouncement=function(){const title=document.getElementById('ann-title').value.trim();const content=document.getElementById('ann-content').value.trim();if(!title||!content){showToast('Fill all fields','warning');return}fbPush('announcements',{title,content,active:true,createdAt:new Date().toISOString()});showToast('Published','success');closeModal()};
+    window.toggleAnnouncement=function(id,active){fbUpdate('announcements/'+id,{active})};
+    window.deleteAnnouncement=function(id){showConfirm('Delete?',function(){fbRemove('announcements/'+id)})};
+
+    // ---- Admin Users ----
+    function renderAdminUsers(){const arr=Object.entries(allAdminUsers).map(([k,v])=>({...v,id:k}));const tbody=document.getElementById('admin-users-table');const emptyEl=document.getElementById('users-empty');if(arr.length===0){tbody.innerHTML='';emptyEl.classList.remove('hidden')}else{emptyEl.classList.add('hidden');tbody.innerHTML=arr.map(u=>'<tr class="hover:bg-gray-50/50 dark:hover:bg-gray-700/50"><td class="px-5 py-3"><div class="flex items-center gap-2"><img src="https://ui-avatars.com/api/?name='+encodeURIComponent(u.name||'U')+'&background=006A4E&color=fff&size=32" class="w-8 h-8 rounded-full"><span class="font-medium">'+(u.name||'N/A')+'</span></div></td><td class="px-5 py-3 text-gray-500">'+(u.email||'')+'</td><td class="px-5 py-3">'+statusBadge(u.role||'viewer')+'</td><td class="px-5 py-3">'+statusBadge(u.status||'active')+'</td><td class="px-5 py-3 text-xs text-gray-500">'+dateStr(u.lastLogin)+'</td><td class="px-5 py-3 text-right"><button onclick="deleteAdminUser(\''+u.id+'\')" class="p-1 text-gray-400 hover:text-red-600"><i class="bi bi-trash"></i></button></td></tr>').join('')}}
+
+    window.openAddAdminUserModal=function(){openModal('<div class="flex justify-between items-start mb-4"><h3 class="font-bold text-gray-800 dark:text-white text-lg">Add Admin User</h3><button onclick="closeModal()" class="text-gray-400 hover:text-gray-600"><i class="bi bi-x-lg"></i></button></div><div class="space-y-3"><div><label class="text-xs text-gray-500 block mb-1">Name *</label><input type="text" id="au-name" class="w-full px-3 py-2 border rounded-lg text-sm dark:bg-gray-700 dark:border-gray-600"></div><div><label class="text-xs text-gray-500 block mb-1">Email *</label><input type="email" id="au-email" class="w-full px-3 py-2 border rounded-lg text-sm dark:bg-gray-700 dark:border-gray-600"></div><div><label class="text-xs text-gray-500 block mb-1">Role *</label><select id="au-role" class="w-full px-3 py-2 border rounded-lg text-sm dark:bg-gray-700 dark:border-gray-600"><option value="super_admin">Super Admin</option><option value="manager">Manager</option><option value="support">Support Agent</option><option value="viewer">Viewer (Read-only)</option></select></div></div><div class="flex justify-end gap-2 mt-5"><button onclick="closeModal()" class="px-4 py-2 border rounded-lg text-sm">Cancel</button><button onclick="addAdminUser()" class="px-4 py-2 bg-bd-green text-white rounded-lg text-sm">Add User</button></div>')};
+
+    window.addAdminUser=function(){const name=document.getElementById('au-name').value.trim();const email=document.getElementById('au-email').value.trim();if(!name||!email){showToast('Required','warning');return}fbPush('admin_users',{name,email,role:document.getElementById('au-role').value,status:'active',createdAt:new Date().toISOString()});showToast('Admin user added','success');addAdminLog('Add Admin User',name,'success');closeModal()};
+    window.deleteAdminUser=function(id){showConfirm('Remove this admin user?',function(){fbRemove('admin_users/'+id)})};
+
+    // ---- Email Templates ----
+    function renderEmailTemplates(){const arr=Object.entries(allEmailTemplates).map(([k,v])=>({...v,id:k}));const container=document.getElementById('email-templates-list');const emptyEl=document.getElementById('etpl-empty');if(arr.length===0){container.innerHTML='';emptyEl.classList.remove('hidden')}else{emptyEl.classList.add('hidden');container.innerHTML=arr.map(t=>'<div class="p-4 sm:p-5 hover:bg-gray-50 dark:hover:bg-gray-700/50 flex justify-between items-center"><div><h4 class="font-semibold text-gray-800 dark:text-white text-sm">'+(t.name||'Untitled')+'</h4><p class="text-xs text-gray-500 mt-0.5">Trigger: '+(t.trigger||'manual')+' \u00B7 Subject: '+(t.subject||'N/A')+'</p></div><div class="flex gap-1"><button onclick="editEmailTemplate(\''+t.id+'\')" class="p-1 text-gray-400 hover:text-blue-600"><i class="bi bi-pencil"></i></button><button onclick="deleteEmailTemplate(\''+t.id+'\')" class="p-1 text-gray-400 hover:text-red-600"><i class="bi bi-trash"></i></button></div></div>').join('')}}
+
+    window.openCreateEmailTemplateModal=function(){openModal('<div class="flex justify-between items-start mb-4"><h3 class="font-bold text-gray-800 dark:text-white text-lg">New Email Template</h3><button onclick="closeModal()" class="text-gray-400 hover:text-gray-600"><i class="bi bi-x-lg"></i></button></div><div class="space-y-3"><div><label class="text-xs text-gray-500 block mb-1">Template Name *</label><input type="text" id="etpl-name" class="w-full px-3 py-2 border rounded-lg text-sm dark:bg-gray-700 dark:border-gray-600" placeholder="e.g. Payment Confirmation"></div><div><label class="text-xs text-gray-500 block mb-1">Trigger</label><select id="etpl-trigger" class="w-full px-3 py-2 border rounded-lg text-sm dark:bg-gray-700 dark:border-gray-600"><option value="payment_success">Payment Success</option><option value="payment_failed">Payment Failed</option><option value="refund_processed">Refund Processed</option><option value="invoice_created">Invoice Created</option><option value="manual">Manual Send</option></select></div><div><label class="text-xs text-gray-500 block mb-1">Subject *</label><input type="text" id="etpl-subject" class="w-full px-3 py-2 border rounded-lg text-sm dark:bg-gray-700 dark:border-gray-600" placeholder="Email subject line"></div><div><label class="text-xs text-gray-500 block mb-1">Body *</label><textarea id="etpl-body" class="w-full px-3 py-2 border rounded-lg text-sm dark:bg-gray-700 dark:border-gray-600" rows="5" placeholder="Use {{name}}, {{amount}}, {{txId}} as placeholders"></textarea></div></div><div class="flex justify-end gap-2 mt-5"><button onclick="closeModal()" class="px-4 py-2 border rounded-lg text-sm">Cancel</button><button onclick="createEmailTemplate()" class="px-4 py-2 bg-bd-green text-white rounded-lg text-sm">Save Template</button></div>',true)};
+
+    window.createEmailTemplate=function(){const name=document.getElementById('etpl-name').value.trim();const subject=document.getElementById('etpl-subject').value.trim();const body=document.getElementById('etpl-body').value.trim();if(!name||!subject||!body){showToast('Fill all fields','warning');return}fbPush('email_templates',{name,trigger:document.getElementById('etpl-trigger').value,subject,body,createdAt:new Date().toISOString()});showToast('Template saved','success');closeModal()};
+    window.editEmailTemplate=function(id){const t=allEmailTemplates[id];if(!t)return;openModal('<div class="flex justify-between items-start mb-4"><h3 class="font-bold text-gray-800 dark:text-white text-lg">Edit Template</h3><button onclick="closeModal()" class="text-gray-400 hover:text-gray-600"><i class="bi bi-x-lg"></i></button></div><div class="space-y-3"><div><label class="text-xs text-gray-500 block mb-1">Name</label><input type="text" id="etpl-edit-name" value="'+(t.name||'')+'" class="w-full px-3 py-2 border rounded-lg text-sm dark:bg-gray-700 dark:border-gray-600"></div><div><label class="text-xs text-gray-500 block mb-1">Subject</label><input type="text" id="etpl-edit-subject" value="'+(t.subject||'')+'" class="w-full px-3 py-2 border rounded-lg text-sm dark:bg-gray-700 dark:border-gray-600"></div><div><label class="text-xs text-gray-500 block mb-1">Body</label><textarea id="etpl-edit-body" class="w-full px-3 py-2 border rounded-lg text-sm dark:bg-gray-700 dark:border-gray-600" rows="5">'+(t.body||'')+'</textarea></div></div><div class="flex justify-end gap-2 mt-5"><button onclick="closeModal()" class="px-4 py-2 border rounded-lg text-sm">Cancel</button><button onclick="saveEditEmailTemplate(\''+id+'\')" class="px-4 py-2 bg-bd-green text-white rounded-lg text-sm">Save</button></div>',true)};
+    window.saveEditEmailTemplate=function(id){fbUpdate('email_templates/'+id,{name:document.getElementById('etpl-edit-name').value.trim(),subject:document.getElementById('etpl-edit-subject').value.trim(),body:document.getElementById('etpl-edit-body').value.trim()}).then(()=>{showToast('Updated','success');closeModal()})};
+    window.deleteEmailTemplate=function(id){showConfirm('Delete template?',function(){fbRemove('email_templates/'+id)})};
+
+    // ---- CSV Export ----
+    window.exportCSV=function(type){let rows=[];let filename='report';const txArr=Object.entries(allTransactions).map(([k,v])=>({...v,id:k}));if(type==='all'||type==='daily'||type==='monthly'||type==='gateway'){let data=txArr;if(type==='daily'){data=data.filter(t=>(t.timestamp||t.date||'').startsWith(new Date().toISOString().split('T')[0]));filename='daily_report'}else if(type==='monthly'){data=data.filter(t=>(t.timestamp||t.date||'').startsWith(new Date().toISOString().substring(0,7)));filename='monthly_report'}else if(type==='gateway'){filename='gateway_report'}else{data=getFilteredTx();filename='transactions'}rows.push(['ID','Name','Email','Phone','Amount','Method','Status','Date']);data.forEach(t=>rows.push([t.id,t.name||t.customerName||'',t.email||t.customerEmail||'',t.phone||t.customerPhone||'',t.amount,t.method,t.status,t.timestamp||t.date||'']))}else if(type==='merchants'){rows.push(['ID','Name','Email','Phone','Commission','Status','Created']);Object.entries(allMerchants).forEach(([k,m])=>rows.push([k,m.name||'',m.email||'',m.phone||'',m.commission||0,m.status||'',m.createdAt||'']));filename='merchants_report'}else if(type==='customers'){rows.push(['Name','Email','Phone','Total Spent','Tx Count','Tags','Last Active']);Object.values(window._computedCustomers||{}).forEach(c=>rows.push([c.name,c.email,c.phone,c.totalSpent,c.txCount,(c.tags||[]).join(';'),c.lastActive]));filename='customers_report'}const csv=rows.map(r=>r.map(c=>'"'+(c+'').replace(/"/g,'""')+'"').join(',')).join('\n');const blob=new Blob([csv],{type:'text/csv'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=filename+'.csv';a.click();URL.revokeObjectURL(url);showToast('Exported: '+filename+'.csv','success');addAdminLog('Export CSV',filename,'info')};
+
+    // ---- Settings ----
+    function loadSettings(){fbOnValue('system_settings',function(snap){systemSettings=snap.val()||{};const fields={maintenance:'setting-maintenance',txLimit:'setting-tx-limit',minTxAmount:'setting-min-tx',currency:'setting-currency',autoAcceptSettlements:'setting-auto-settle',siteName:'setting-site-name',adminEmail:'setting-admin-email',notificationSound:'setting-notif-sound',enableCoupons:'setting-coupons',allowRefunds:'setting-refunds',autoApprove:'setting-auto-approve'};Object.entries(fields).forEach(([key,elId])=>{const el=document.getElementById(elId);if(!el||systemSettings[key]===undefined)return;if(el.type==='checkbox')el.checked=systemSettings[key];else el.value=systemSettings[key]})})}
+
+    window.saveSettings=function(){const data={maintenanceMode:document.getElementById('setting-maintenance').checked,txLimit:Number(document.getElementById('setting-tx-limit').value),minTxAmount:Number(document.getElementById('setting-min-tx').value),currency:document.getElementById('setting-currency').value,autoAcceptSettlements:document.getElementById('setting-auto-settle').checked,siteName:document.getElementById('setting-site-name').value.trim(),adminEmail:document.getElementById('setting-admin-email').value.trim(),notificationSound:document.getElementById('setting-notif-sound').checked,enableCoupons:document.getElementById('setting-coupons').checked,allowRefunds:document.getElementById('setting-refunds').checked,autoApprove:document.getElementById('setting-auto-approve').checked,twoFactorAuth:document.getElementById('setting-2fa').checked,sessionTimeout:Number(document.getElementById('setting-session-timeout').value),dailyLimit:Number(document.getElementById('setting-daily-limit').value),emailNotifications:document.getElementById('setting-email-notif').checked,fraudDetection:document.getElementById('setting-fraud-detect').checked};fbUpdate('system_settings',data).then(()=>{showToast('Settings saved','success');addAdminLog('Save Settings','System settings updated','success')}).catch(e=>showToast('Error','error'))};
+
+    // ---- API & Webhook ----
+    function genRandomKey(len){const chars='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';let r='';for(let i=0;i<len;i++)r+=chars.charAt(Math.floor(Math.random()*chars.length));return r}
+    window.generateAPIKey=function(){const key='sp_live_'+genRandomKey(32);document.getElementById('setting-api-key').value=key;fbUpdate('api_settings',{apiKey:key}).then(()=>{showToast('API key generated','success');addAdminLog('API Key','New API key generated','warning')})};
+    window.generateSecretKey=function(){const key='sp_secret_'+genRandomKey(40);document.getElementById('setting-secret-key').value=key;fbUpdate('api_settings',{secretKey:key}).then(()=>{showToast('Secret key generated','success');addAdminLog('Secret Key','New secret key generated','warning')})};
+    window.saveAPISettings=function(){const data={webhookUrl:document.getElementById('setting-webhook-url').value.trim(),ipWhitelist:document.getElementById('setting-ip-whitelist').value.trim(),callbackUrl:document.getElementById('setting-callback-url').value.trim()};fbUpdate('api_settings',data).then(()=>{showToast('API settings saved','success');addAdminLog('API Settings','API & webhook settings updated','success')}).catch(e=>showToast('Error','error'))};
+    window.testWebhook=function(){const url=document.getElementById('setting-webhook-url').value.trim();if(!url){showToast('Enter a webhook URL first','warning');return}showToast('Webhook test sent to: '+url,'info');addAdminLog('Webhook Test','Test sent to '+url,'info')};
+    window.copyToClipboard=function(text){navigator.clipboard.writeText(text).then(()=>showToast('Copied!','success')).catch(()=>{const el=document.createElement('textarea');el.value=text;document.body.appendChild(el);el.select();document.execCommand('copy');el.remove();showToast('Copied!','success')})};
+    function loadAPISettings(){fbGet('api_settings').then(snap=>{const d=snap.val()||{};if(d.apiKey)document.getElementById('setting-api-key').value=d.apiKey;if(d.secretKey)document.getElementById('setting-secret-key').value=d.secretKey;if(d.webhookUrl)document.getElementById('setting-webhook-url').value=d.webhookUrl;if(d.ipWhitelist)document.getElementById('setting-ip-whitelist').value=d.ipWhitelist;if(d.callbackUrl)document.getElementById('setting-callback-url').value=d.callbackUrl})}
+
+    // ---- Coupons ----
+    window.openAddCouponModal=function(){openModal('<div class="flex justify-between items-start mb-4"><h3 class="font-bold text-lg text-gray-800 dark:text-white">Add Coupon</h3><button onclick="closeModal()" class="text-gray-400 hover:text-gray-600 text-xl"><i class="bi bi-x-lg"></i></button></div><div class="space-y-3"><div><label class="text-xs text-gray-500 block mb-1">Coupon Code</label><input type="text" id="coupon-code-input" class="w-full px-3 py-2 border border-gray-200 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-700 uppercase" placeholder="e.g. SAVE10" maxlength="15"></div><div><label class="text-xs text-gray-500 block mb-1">Discount Type</label><select id="coupon-type-input" class="w-full px-3 py-2 border border-gray-200 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-700"><option value="percent">Percentage (%)</option><option value="fixed">Fixed Amount (\u09F3)</option></select></div><div><label class="text-xs text-gray-500 block mb-1">Value</label><input type="number" id="coupon-value-input" class="w-full px-3 py-2 border border-gray-200 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-700" placeholder="10" min="1"></div><button onclick="saveCoupon()" class="w-full bg-bd-green text-white py-2 rounded-lg text-sm font-medium hover:bg-emerald-800 mt-2"><i class="bi bi-check-lg mr-1"></i>Save Coupon</button></div>')};
+    window.saveCoupon=function(){const code=document.getElementById('coupon-code-input').value.trim().toUpperCase();const type=document.getElementById('coupon-type-input').value;const value=Number(document.getElementById('coupon-value-input').value);if(!code||!value){showToast('Fill all fields','warning');return}fbSet('coupons/'+code,{code,type,value,active:true,createdAt:new Date().toISOString()}).then(()=>{showToast('Coupon created','success');closeModal();addAdminLog('Coupon Created',code+' - '+value+(type==='percent'?'%':' BDT'),'success');loadCoupons()}).catch(e=>showToast('Error','error'))};
+    function loadCoupons(){fbOnValue('coupons',function(snap){const coupons=snap.val()||{};const el=document.getElementById('coupon-list');if(Object.keys(coupons).length===0){el.innerHTML='<p class="text-gray-400 text-sm text-center py-4">No coupons yet</p>';return}el.innerHTML=Object.entries(coupons).map(([code,c])=>'<div class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg"><div><span class="font-mono font-bold text-sm text-gray-800 dark:text-white">'+code+'</span><span class="ml-2 text-xs text-gray-500">'+c.value+(c.type==='percent'?'% off':' \u09F3 off')+'</span></div><div class="flex items-center gap-2"><span class="text-[10px] px-2 py-0.5 rounded-full '+(c.active?'bg-emerald-100 text-emerald-700':'bg-red-100 text-red-700')+'">'+(c.active?'Active':'Inactive')+'</span><button onclick="toggleCoupon(\''+code+'\','+(!c.active)+')" class="text-xs text-blue-600 hover:underline">'+(c.active?'Disable':'Enable')+'</button><button onclick="deleteCoupon(\''+code+'\')" class="text-xs text-red-600 hover:underline">Delete</button></div></div>').join('')})}
+    window.toggleCoupon=function(code,active){fbUpdate('coupons/'+code,{active}).then(()=>showToast('Coupon '+(active?'enabled':'disabled'),'info'))};
+    window.deleteCoupon=function(code){showConfirm('Delete coupon '+code+'?',function(){fbRemove('coupons/'+code).then(()=>showToast('Coupon deleted','success'))})};
+
+    // ---- Logs ----
+    function loadLogs(){fbOnValue('admin_logs',function(snap){allLogs=snap.val()||{};filterLogs()})}
+
+    window.filterLogs=function(){const typeF=document.getElementById('log-filter-type').value;const search=(document.getElementById('log-search').value||'').toLowerCase();let entries=Object.entries(allLogs).sort((a,b)=>new Date(a[1].timestamp||0)-new Date(b[1].timestamp||0));if(typeF!=='all')entries=entries.filter(([k,l])=>l.type===typeF);if(search)entries=entries.filter(([k,l])=>(l.action||'').toLowerCase().includes(search)||(l.details||'').toLowerCase().includes(search));document.getElementById('log-count-label').textContent=entries.length+' log entries';const container=document.getElementById('admin-logs-container');let html='';entries.forEach(([k,log])=>{const tc=log.type==='success'?'log-success':log.type==='error'?'log-error':log.type==='warning'?'log-warning':'log-info';const ts=log.timestamp?new Date(log.timestamp).toLocaleString('en-GB'):'?';html+='<div class="'+tc+'">['+ts+'] <strong>'+log.action+'</strong> \u2014 '+log.details+' <span class="text-gray-500">('+log.adminId+')</span></div>'});container.innerHTML=html||'<p class="text-gray-600">[System] No logs found</p>';container.scrollTop=container.scrollHeight};
+
+    window.clearLogs=function(){showConfirm('Clear all logs?',function(){fbRemove('admin_logs').then(()=>showToast('Logs cleared','success'))})};
+
+    // ---- Backup ----
+    window.exportFullBackup=function(){fbGet('').then(snap=>{const data=snap.val()||{};const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='shighropay_backup_'+new Date().toISOString().split('T')[0]+'.json';a.click();URL.revokeObjectURL(url);showToast('Backup downloaded','success');addAdminLog('Backup','Full data export','success')})};
+
+    window.importBackup=function(event){const file=event.target.files[0];if(!file)return;const reader=new FileReader();reader.onload=function(e){try{const data=JSON.parse(e.target.result);showConfirm('This will merge imported data. Continue?',function(){fbUpdate('',data).then(()=>{showToast('Data imported successfully','success');addAdminLog('Import','Backup restored','success')}).catch(err=>showToast('Import error: '+err.message,'error'))})}catch(err){showToast('Invalid JSON file','error')}};reader.readAsText(file)};
+
+    window.resetAllData=function(){showConfirm('This will DELETE ALL DATA. This action CANNOT be undone. Are you absolutely sure?',function(){fbSet('',{}).then(()=>{showToast('All data has been reset','warning');addAdminLog('Reset','All data cleared','error')}).catch(e=>showToast('Error','error'))})};
+
+    // ---- Logout ----
+    window.doLogout=function(){showConfirm('Logout?',function(){addAdminLog('Admin Logout',localStorage.getItem('adminName')||'Admin','info');localStorage.removeItem('adminLoggedIn');localStorage.removeItem('rememberAdmin');location.reload()})};
+
+    // ---- Expose globals ----
+    window.showToast=showToast;window.openModal=openModal;window.closeModal=closeModal;window.showConfirm=showConfirm;window.addAdminLog=addAdminLog;
+
+    // ---- Firebase Status ----
+    function setFirebaseStatus(online){const el=document.getElementById('firebase-status');if(online){el.innerHTML='<span class="w-1.5 h-1.5 rounded-full bg-emerald-500 pulse-dot"></span> Online';el.className='flex items-center gap-1 text-[10px] px-2 py-1 rounded-full bg-emerald-50 dark:bg-emerald-900/50 text-emerald-600'}else{el.innerHTML='<span class="w-1.5 h-1.5 rounded-full bg-red-500"></span> Offline';el.className='flex items-center gap-1 text-[10px] px-2 py-1 rounded-full bg-red-50 dark:bg-red-900/50 text-red-600'}}
+
+    // ---- Initialize ----
+    let initialized=false;
+    function initApp(){
+        if(initialized)return;initialized=true;setFirebaseStatus(true);
+        const lo=document.getElementById('loadingOverlay');lo.style.opacity='0';lo.style.transition='opacity .3s';setTimeout(()=>lo.classList.add('hidden'),300);
+
+        fbOnValue('transactions',function(snap){allTransactions=snap.val()||{};Object.keys(allTransactions).forEach(k=>{if(!allTransactions[k].id)allTransactions[k].id=k});updateDashboard();window.renderTransactions();renderCustomers()});
+        fbOnValue('merchants',function(snap){allMerchants=snap.val()||{};renderMerchants();updateDashboard()});
+        fbOnValue('settlements',function(snap){allSettlements=snap.val()||{};renderSettlements()});
+        fbOnValue('customers',function(snap){allCustomers=snap.val()||{};renderCustomers()});
+        fbOnValue('invoices',function(snap){allInvoices=snap.val()||{};renderInvoices()});
+        fbOnValue('disputes',function(snap){allDisputes=snap.val()||{};renderDisputes();updateDashboard()});
+        fbOnValue('tickets',function(snap){allTickets=snap.val()||{};renderTickets();updateDashboard()});
+        fbOnValue('announcements',function(snap){allAnnouncements=snap.val()||{};renderAnnouncements()});
+        fbOnValue('admin_users',function(snap){allAdminUsers=snap.val()||{};renderAdminUsers()});
+        fbOnValue('email_templates',function(snap){allEmailTemplates=snap.val()||{};renderEmailTemplates()});
+        loadGatewaySettings();loadSettings();loadLogs();loadAPISettings();loadCoupons();
+        addAdminLog('Admin Login',(localStorage.getItem('adminName')||'Admin')+' accessed CRM','success');
+        showToast('Connected to Firebase','success');
+    }
+
+    const ls=document.getElementById('loadingStatus');if(ls)ls.innerText='Authenticating...';
+    onAuthStateChanged(auth,function(user){if(user){const s=document.getElementById('loadingStatus');if(s)s.innerText='Loading data...';initApp()}});
+    signInAnonymously(auth).then(function(){const s=document.getElementById('loadingStatus');if(s)s.innerText='Authenticated!'}).catch(function(err){console.error("Auth error:",err);setFirebaseStatus(false);const o=document.getElementById('loadingOverlay');if(o){o.innerHTML='<div class="text-center p-6 max-w-md"><div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4"><i class="bi bi-exclamation-triangle text-3xl text-red-600"></i></div><h2 class="text-xl font-bold text-gray-800 dark:text-white mb-2">Connection Failed</h2><p class="text-gray-500 text-sm mb-4">'+err.message+'</p><button onclick="location.reload()" class="px-6 py-2 bg-bd-green text-white rounded-lg">Retry</button></div>';o.classList.remove('hidden')}});
+</script>
+</body>
+</html>

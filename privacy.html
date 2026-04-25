@@ -1,0 +1,123 @@
+<!-- privacy.html - Privacy Policy | ShighroPay -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Privacy Policy | ShighroPay</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>S</text></svg>">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <script>tailwind.config={darkMode:'class',theme:{extend:{colors:{'bd-green':'#006A4E','bd-red':'#F42A41'}}}}</script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body{font-family:'Inter',sans-serif}
+        .prose h3{margin-top:1.5rem;margin-bottom:.75rem;font-weight:700;font-size:1.1rem;color:#1f2937}
+        .dark .prose h3{color:#fff}
+        .prose p,.prose li{font-size:.875rem;line-height:1.75;color:#6b7280}
+        .dark .prose p,.dark .prose li{color:#9ca3af}
+        .prose ul{list-style:disc;padding-left:1.5rem}
+    </style>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 min-h-screen flex flex-col">
+<header class="bg-white dark:bg-gray-800 shadow-sm sticky top-0 z-10">
+    <div class="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
+        <a href="index.html" class="flex items-center gap-3">
+            <div class="w-9 h-9 bg-bd-green rounded-lg flex items-center justify-center text-white font-bold text-lg">S</div>
+            <h1 class="font-bold text-lg text-gray-800 dark:text-white">ShighroPay</h1>
+        </a>
+        <div class="flex gap-2">
+            <button onclick="document.documentElement.classList.toggle('dark');localStorage.setItem('darkMode',document.documentElement.classList.contains('dark'))" class="p-2 text-gray-400 hover:text-bd-green"><i class="bi bi-moon-stars"></i></button>
+            <a href="dashboard.html" class="px-4 py-2 bg-bd-green text-white rounded-lg text-sm hover:bg-emerald-800">Dashboard</a>
+        </div>
+    </div>
+</header>
+
+<main class="flex-1 max-w-4xl mx-auto px-4 sm:px-6 py-8">
+    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6 sm:p-10">
+        <h2 class="text-3xl font-bold text-gray-800 dark:text-white mb-2">Privacy Policy</h2>
+        <p class="text-sm text-gray-500 mb-8">Last updated: January 2025</p>
+
+        <div class="prose max-w-none">
+            <h3>1. Information We Collect</h3>
+            <p>ShighroPay collects information to provide better services to our users. The types of information we collect include:</p>
+            <ul>
+                <li><strong>Personal Information:</strong> Name, email address, phone number, and billing address</li>
+                <li><strong>Transaction Data:</strong> Payment amounts, methods, dates, and transaction references</li>
+                <li><strong>Device Information:</strong> Browser type, device type, IP address, and operating system</li>
+                <li><strong>Usage Data:</strong> Pages visited, features used, and interaction patterns</li>
+            </ul>
+
+            <h3>2. How We Use Your Information</h3>
+            <p>We use the collected information for the following purposes:</p>
+            <ul>
+                <li>Processing and completing payment transactions</li>
+                <li>Providing customer support and resolving disputes</li>
+                <li>Sending transaction notifications and receipts</li>
+                <li>Improving our services and user experience</li>
+                <li>Detecting and preventing fraud or unauthorized activities</li>
+                <li>Complying with legal obligations and regulations</li>
+            </ul>
+
+            <h3>3. Data Storage & Security</h3>
+            <p>We implement industry-standard security measures to protect your personal information:</p>
+            <ul>
+                <li>Data is encrypted in transit using TLS/SSL</li>
+                <li>Firebase Realtime Database with security rules</li>
+                <li>Regular security audits and monitoring</li>
+                <li>Access controls and authentication mechanisms</li>
+                <li>Data backup and disaster recovery procedures</li>
+            </ul>
+
+            <h3>4. Information Sharing</h3>
+            <p>We do not sell, trade, or rent your personal information. We may share information with:</p>
+            <ul>
+                <li>Payment processors (bKash, Nagad, Rocket, Upay, SureCash) to complete transactions</li>
+                <li>Service providers who assist in operating our platform</li>
+                <li>Law enforcement when required by law or legal process</li>
+                <li>Third parties with your explicit consent</li>
+            </ul>
+
+            <h3>5. Cookies & Tracking</h3>
+            <p>We use local storage and cookies to:</p>
+            <ul>
+                <li>Remember your preferences (dark mode, language)</li>
+                <li>Maintain your session state</li>
+                <li>Analyze usage patterns to improve our service</li>
+            </ul>
+
+            <h3>6. Your Rights</h3>
+            <p>You have the right to:</p>
+            <ul>
+                <li>Access your personal data stored by us</li>
+                <li>Request correction of inaccurate data</li>
+                <li>Request deletion of your personal data</li>
+                <li>Opt out of marketing communications</li>
+                <li>Export your transaction data</li>
+            </ul>
+
+            <h3>7. Data Retention</h3>
+            <p>We retain your personal information for as long as necessary to provide our services and fulfill the purposes outlined in this policy. Transaction data is retained for a minimum of 5 years for compliance and audit purposes.</p>
+
+            <h3>8. Children's Privacy</h3>
+            <p>Our Service is not intended for individuals under the age of 18. We do not knowingly collect personal information from minors.</p>
+
+            <h3>9. Changes to This Policy</h3>
+            <p>We may update this Privacy Policy periodically. Changes will be posted on this page with an updated revision date. We encourage you to review this policy regularly.</p>
+
+            <h3>10. Contact Us</h3>
+            <p>If you have questions about this Privacy Policy, please <a href="contact.html" class="text-bd-green hover:underline">contact us</a>.</p>
+        </div>
+    </div>
+</main>
+
+<footer class="bg-white dark:bg-gray-800 border-t border-gray-100 dark:border-gray-700 mt-8">
+    <div class="max-w-4xl mx-auto px-4 py-4 flex flex-col sm:flex-row justify-between items-center text-xs text-gray-400 gap-2">
+        <p>&copy; 2025 ShighroPay. All rights reserved.</p>
+        <div class="flex gap-4"><a href="index.html" class="hover:text-bd-green">Home</a><a href="terms.html" class="hover:text-bd-green">Terms</a><a href="contact.html" class="hover:text-bd-green">Contact</a></div>
+    </div>
+</footer>
+
+<script>if(localStorage.getItem('darkMode')==='true')document.documentElement.classList.add('dark')</script>
+</body>
+</html>

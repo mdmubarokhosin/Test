@@ -1,0 +1,284 @@
+<!-- dashboard.html - User Dashboard | ShighroPay -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | ShighroPay</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>S</text></svg>">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <script>tailwind.config={darkMode:'class',theme:{extend:{colors:{'bd-green':'#006A4E','bd-red':'#F42A41'}}}}</script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body{font-family:'Inter',sans-serif}
+        .fade-in{animation:fadeIn .3s ease}
+        @keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+        .stat-card{transition:all .2s}.stat-card:hover{transform:translateY(-2px);box-shadow:0 8px 25px -5px rgba(0,0,0,.1)}
+        .toast-container{position:fixed;top:1rem;right:1rem;z-index:9999;display:flex;flex-direction:column;gap:.5rem}
+        .toast{padding:.75rem 1.25rem;border-radius:.5rem;color:#fff;font-size:.875rem;box-shadow:0 10px 25px rgba(0,0,0,.15);animation:slideIn .3s}
+        .toast-success{background:#059669}.toast-error{background:#dc2626}.toast-info{background:#2563eb}
+        @keyframes slideIn{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
+        .badge{display:inline-flex;align-items:center;padding:2px 10px;border-radius:9999px;font-size:.7rem;font-weight:600;text-transform:capitalize}
+        .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);backdrop-filter:blur(4px);z-index:60;display:flex;align-items:center;justify-content:center;padding:1rem}
+        .modal-content{background:#fff;border-radius:1rem;box-shadow:0 25px 50px rgba(0,0,0,.25);width:100%;max-width:560px;max-height:90vh;overflow-y:auto;animation:scaleIn .2s}
+        .dark .modal-content{background:#1e293b;color:#e2e8f0}
+        @keyframes scaleIn{from{transform:scale(.95);opacity:0}to{transform:scale(1);opacity:1}}
+        ::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:#f1f1f1}::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:4px}
+        .dark ::-webkit-scrollbar-track{background:#1e293b}.dark ::-webkit-scrollbar-thumb{background:#475569}
+        .tab-btn{transition:all .15s;border-bottom:2px solid transparent;padding-bottom:8px}.tab-btn.active{color:#006A4E;border-bottom-color:#006A4E}
+        .activity-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:6px}
+    </style>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200 min-h-screen">
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- Header -->
+<header class="bg-white dark:bg-gray-800 shadow-sm sticky top-0 z-20">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+            <div class="w-9 h-9 bg-bd-green rounded-lg flex items-center justify-center text-white font-bold text-lg shadow-md">S</div>
+            <div><h1 class="font-bold text-lg text-gray-800 dark:text-white">ShighroPay</h1><p class="text-[10px] text-gray-400 hidden sm:block">Payment Dashboard</p></div>
+        </div>
+        <div class="flex items-center gap-2 sm:gap-3">
+            <button onclick="toggleDarkMode()" class="p-2 text-gray-400 hover:text-bd-green rounded-lg transition-colors" title="Dark Mode"><i class="bi bi-moon-stars" id="darkModeIcon"></i></button>
+            <div class="relative">
+                <button onclick="toggleNotif()" class="p-2 text-gray-400 hover:text-bd-green rounded-lg relative"><i class="bi bi-bell"></i><span id="notif-badge" class="absolute -top-0.5 -right-0.5 w-4 h-4 bg-bd-red text-white text-[9px] rounded-full flex items-center justify-center hidden">0</span></button>
+                <div id="notifDropdown" class="hidden absolute right-0 mt-2 w-72 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-100 dark:border-gray-700 overflow-hidden z-30">
+                    <div class="p-3 border-b border-gray-100 dark:border-gray-700 flex justify-between items-center"><h4 class="font-bold text-sm">Notifications</h4><button onclick="clearNotifications()" class="text-[10px] text-bd-green hover:underline">Clear all</button></div>
+                    <div id="notif-list" class="max-h-48 overflow-y-auto"></div>
+                </div>
+            </div>
+            <button onclick="openProfileModal()" class="flex items-center gap-2 bg-gray-100 dark:bg-gray-700 rounded-lg px-3 py-1.5 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
+                <div class="w-7 h-7 bg-bd-green rounded-full flex items-center justify-center text-white text-xs font-bold" id="user-avatar">U</div>
+                <span class="text-sm font-medium hidden sm:inline" id="user-name">User</span>
+            </button>
+            <a href="index.html" class="px-3 sm:px-4 py-2 bg-bd-green text-white rounded-lg text-sm font-medium hover:bg-emerald-800 transition-colors flex items-center gap-1"><i class="bi bi-plus-circle"></i><span class="hidden sm:inline"> New Payment</span></a>
+        </div>
+    </div>
+</header>
+
+<main class="max-w-7xl mx-auto px-4 sm:px-6 py-6 space-y-6 fade-in">
+    <!-- Announcements -->
+    <div id="announcements-section" class="hidden">
+        <div class="bg-gradient-to-r from-bd-green to-emerald-600 text-white p-4 rounded-xl shadow-sm flex items-center gap-3">
+            <i class="bi bi-megaphone text-xl flex-shrink-0"></i><div id="announcement-content" class="flex-1"></div>
+            <button onclick="this.closest('div').parentElement.classList.add('hidden')" class="text-emerald-200 hover:text-white flex-shrink-0"><i class="bi bi-x-lg"></i></button>
+        </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="grid grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4">
+        <div class="stat-card bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
+            <div class="flex items-center justify-between"><div><p class="text-xs text-gray-500">Total Transactions</p><h3 class="text-2xl font-bold text-gray-800 dark:text-white mt-1" id="stat-total">0</h3></div><div class="p-2 bg-purple-100 dark:bg-purple-900 text-purple-600 rounded-lg"><i class="bi bi-arrow-left-right text-lg"></i></div></div>
+        </div>
+        <div class="stat-card bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
+            <div class="flex items-center justify-between"><div><p class="text-xs text-gray-500">Successful</p><h3 class="text-2xl font-bold text-emerald-600 mt-1" id="stat-paid">0</h3></div><div class="p-2 bg-emerald-100 dark:bg-emerald-900 text-emerald-600 rounded-lg"><i class="bi bi-check-circle text-lg"></i></div></div>
+        </div>
+        <div class="stat-card bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
+            <div class="flex items-center justify-between"><div><p class="text-xs text-gray-500">Pending</p><h3 class="text-2xl font-bold text-amber-600 mt-1" id="stat-pending">0</h3></div><div class="p-2 bg-amber-100 dark:bg-amber-900 text-amber-600 rounded-lg"><i class="bi bi-hourglass-split text-lg"></i></div></div>
+        </div>
+        <div class="stat-card bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
+            <div class="flex items-center justify-between"><div><p class="text-xs text-gray-500">Failed</p><h3 class="text-2xl font-bold text-red-500 mt-1" id="stat-failed">0</h3></div><div class="p-2 bg-red-100 dark:bg-red-900 text-red-500 rounded-lg"><i class="bi bi-x-circle text-lg"></i></div></div>
+        </div>
+        <div class="stat-card bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 col-span-2 lg:col-span-1">
+            <div class="flex items-center justify-between"><div><p class="text-xs text-gray-500">Total Amount</p><h3 class="text-2xl font-bold text-blue-600 mt-1" id="stat-amount">0</h3></div><div class="p-2 bg-blue-100 dark:bg-blue-900 text-blue-600 rounded-lg"><i class="bi bi-currency-dollar text-lg"></i></div></div>
+        </div>
+    </div>
+
+    <!-- Charts Row -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <div class="lg:col-span-2 bg-white dark:bg-gray-800 p-5 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
+            <div class="flex justify-between items-center mb-4"><h3 class="font-bold text-sm text-gray-800 dark:text-white">Payment History (7 Days)</h3><div class="flex gap-1"><button onclick="setChartType('amount')" id="chart-type-amount" class="text-[10px] px-2 py-1 rounded bg-bd-green text-white">Amount</button><button onclick="setChartType('count')" id="chart-type-count" class="text-[10px] px-2 py-1 rounded bg-gray-100 dark:bg-gray-700 text-gray-500">Count</button></div></div>
+            <div class="flex items-end gap-1.5 h-40 sm:h-48" id="chart-bars"></div>
+            <div class="flex justify-between text-[9px] text-gray-400 mt-2" id="chart-labels"></div>
+        </div>
+        <div class="bg-white dark:bg-gray-800 p-5 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
+            <h3 class="font-bold text-sm text-gray-800 dark:text-white mb-4">Payment Methods</h3>
+            <div class="space-y-4" id="method-stats"></div>
+            <div class="mt-5 pt-4 border-t border-gray-100 dark:border-gray-700">
+                <h4 class="font-bold text-xs text-gray-500 mb-3">Status Breakdown</h4>
+                <div class="space-y-2" id="status-breakdown"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Activity Timeline + Quick Actions -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <div class="lg:col-span-2 bg-white dark:bg-gray-800 p-5 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
+            <div class="flex justify-between items-center mb-4"><h3 class="font-bold text-sm text-gray-800 dark:text-white">Recent Activity</h3><span class="text-[10px] text-gray-400" id="activity-count">0 activities</span></div>
+            <div class="space-y-3 max-h-52 overflow-y-auto" id="activity-timeline"></div>
+        </div>
+        <div class="bg-white dark:bg-gray-800 p-5 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
+            <h3 class="font-bold text-sm text-gray-800 dark:text-white mb-4">Quick Actions</h3>
+            <div class="grid grid-cols-2 gap-2">
+                <a href="index.html" class="flex flex-col items-center gap-2 p-3 rounded-xl bg-emerald-50 dark:bg-emerald-900/30 hover:bg-emerald-100 dark:hover:bg-emerald-900/50 transition-colors text-center"><i class="bi bi-plus-circle text-xl text-emerald-600"></i><span class="text-[10px] font-medium text-emerald-700 dark:text-emerald-400">New Payment</span></a>
+                <button onclick="exportTxCSV()" class="flex flex-col items-center gap-2 p-3 rounded-xl bg-blue-50 dark:bg-blue-900/30 hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-colors text-center"><i class="bi bi-download text-xl text-blue-600"></i><span class="text-[10px] font-medium text-blue-700 dark:text-blue-400">Export CSV</span></button>
+                <button onclick="exportPDF()" class="flex flex-col items-center gap-2 p-3 rounded-xl bg-red-50 dark:bg-red-900/30 hover:bg-red-100 dark:hover:bg-red-900/50 transition-colors text-center"><i class="bi bi-file-earmark-pdf text-xl text-red-500"></i><span class="text-[10px] font-medium text-red-700 dark:text-red-400">Export PDF</span></button>
+                <button onclick="openProfileModal()" class="flex flex-col items-center gap-2 p-3 rounded-xl bg-purple-50 dark:bg-purple-900/30 hover:bg-purple-100 dark:hover:bg-purple-900/50 transition-colors text-center"><i class="bi bi-person-gear text-xl text-purple-600"></i><span class="text-[10px] font-medium text-purple-700 dark:text-purple-400">Profile</span></button>
+                <a href="contact.html" class="flex flex-col items-center gap-2 p-3 rounded-xl bg-amber-50 dark:bg-amber-900/30 hover:bg-amber-100 dark:hover:bg-amber-900/50 transition-colors text-center"><i class="bi bi-headset text-xl text-amber-600"></i><span class="text-[10px] font-medium text-amber-700 dark:text-amber-400">Support</span></a>
+                <a href="terms.html" class="flex flex-col items-center gap-2 p-3 rounded-xl bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors text-center"><i class="bi bi-file-text text-xl text-gray-500"></i><span class="text-[10px] font-medium text-gray-600 dark:text-gray-400">Terms</span></a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Transaction Table -->
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
+        <div class="p-4 sm:p-5 border-b border-gray-100 dark:border-gray-700">
+            <div class="flex flex-col sm:flex-row justify-between gap-3">
+                <div class="flex items-center gap-2"><h3 class="font-bold text-gray-800 dark:text-white">Transaction History</h3><span id="tx-count" class="text-[10px] bg-gray-100 dark:bg-gray-700 text-gray-500 px-2 py-0.5 rounded-full">0</span></div>
+                <div class="flex gap-2 flex-wrap">
+                    <input type="text" id="search" oninput="renderTxTable()" placeholder="Search..." class="px-3 py-1.5 border border-gray-200 dark:border-gray-600 rounded-lg text-sm outline-none w-36 bg-white dark:bg-gray-700">
+                    <select id="filter-status" onchange="renderTxTable()" class="px-3 py-1.5 border border-gray-200 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-700"><option value="all">All Status</option><option value="pending">Pending</option><option value="success">Success</option><option value="failed">Failed</option><option value="refunded">Refunded</option></select>
+                    <select id="filter-method" onchange="renderTxTable()" class="px-3 py-1.5 border border-gray-200 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-700"><option value="all">All Methods</option><option value="bkash">bKash</option><option value="nagad">Nagad</option><option value="rocket">Rocket</option><option value="upay">Upay</option></select>
+                    <input type="date" id="filter-date-from" onchange="renderTxTable()" class="px-2 py-1.5 border border-gray-200 dark:border-gray-600 rounded-lg text-xs bg-white dark:bg-gray-700" title="From Date">
+                    <input type="date" id="filter-date-to" onchange="renderTxTable()" class="px-2 py-1.5 border border-gray-200 dark:border-gray-600 rounded-lg text-xs bg-white dark:bg-gray-700" title="To Date">
+                </div>
+            </div>
+            <div class="flex gap-2 mt-3">
+                <button onclick="exportTxCSV()" class="px-3 py-1.5 bg-gray-800 dark:bg-gray-600 text-white rounded-lg text-xs hover:bg-gray-700 flex items-center gap-1"><i class="bi bi-filetype-csv"></i> CSV</button>
+                <button onclick="exportPDF()" class="px-3 py-1.5 bg-red-600 text-white rounded-lg text-xs hover:bg-red-700 flex items-center gap-1"><i class="bi bi-file-earmark-pdf"></i> PDF</button>
+                <button onclick="exportJSON()" class="px-3 py-1.5 bg-blue-600 text-white rounded-lg text-xs hover:bg-blue-700 flex items-center gap-1"><i class="bi bi-filetype-json"></i> JSON</button>
+            </div>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="w-full text-left min-w-[700px]">
+                <thead class="bg-gray-50/50 dark:bg-gray-700/50"><tr><th class="px-5 py-2.5 text-[10px] font-semibold text-gray-500 uppercase">TxID</th><th class="px-5 py-2.5 text-[10px] font-semibold text-gray-500 uppercase">Name</th><th class="px-5 py-2.5 text-[10px] font-semibold text-gray-500 uppercase">Email</th><th class="px-5 py-2.5 text-[10px] font-semibold text-gray-500 uppercase">Amount</th><th class="px-5 py-2.5 text-[10px] font-semibold text-gray-500 uppercase">Method</th><th class="px-5 py-2.5 text-[10px] font-semibold text-gray-500 uppercase">Status</th><th class="px-5 py-2.5 text-[10px] font-semibold text-gray-500 uppercase">Date</th><th class="px-5 py-2.5 text-[10px] font-semibold text-gray-500 uppercase text-right">Action</th></tr></thead>
+                <tbody id="tx-table" class="divide-y divide-gray-50 dark:divide-gray-700 text-sm"></tbody>
+            </table>
+        </div>
+        <div id="tx-empty" class="hidden text-center py-10 text-gray-400"><i class="bi bi-inbox text-4xl block mb-3"></i><p class="font-semibold">No transactions found</p><p class="text-xs mt-1">Start by making a payment</p></div>
+        <div id="pagination" class="p-4 border-t border-gray-50 dark:border-gray-700 flex items-center justify-between text-sm"></div>
+    </div>
+</main>
+
+<!-- Footer -->
+<footer class="bg-white dark:bg-gray-800 border-t border-gray-100 dark:border-gray-700 mt-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex flex-col sm:flex-row justify-between items-center text-xs text-gray-400 gap-2">
+        <p>&copy; 2025 ShighroPay. All rights reserved.</p>
+        <div class="flex gap-4"><a href="admin.html" class="hover:text-bd-green transition-colors">Admin</a><a href="contact.html" class="hover:text-bd-green transition-colors">Help</a><a href="privacy.html" class="hover:text-bd-green transition-colors">Privacy</a><a href="terms.html" class="hover:text-bd-green transition-colors">Terms</a></div>
+    </div>
+</footer>
+
+<div id="modalContainer"></div>
+
+<script type="module">
+    import{initializeApp}from"https://www.gstatic.com/firebasejs/11.7.3/firebase-app.js";
+    import{getDatabase,ref,onValue}from"https://www.gstatic.com/firebasejs/11.7.3/firebase-database.js";
+    import{getAuth,signInAnonymously,onAuthStateChanged}from"https://www.gstatic.com/firebasejs/11.7.3/firebase-auth.js";
+
+    const app=initializeApp({apiKey:"AIzaSyB7vT31Tx4Qkh5jiC73Twi5q7TbuWIt_-0",authDomain:"mypaymentgateway.firebaseapp.com",databaseURL:"https://mypaymentgateway-default-rtdb.firebaseio.com",projectId:"mypaymentgateway",storageBucket:"mypaymentgateway.firebasestorage.app",messagingSenderId:"896209913541",appId:"1:896209913541:web:39616c9e978b8d0a3c92ac"});
+    const db=getDatabase(app);const auth=getAuth(app);
+
+    let allTx={};let currentPage=1;const PER_PAGE=12;let currentUser=null;let chartType='amount';
+
+    function showToast(msg,type='info'){const c=document.getElementById('toastContainer');const t=document.createElement('div');t.className='toast toast-'+type;t.innerHTML='<i class="bi bi-'+(type==='success'?'check-circle-fill':type==='error'?'x-circle-fill':'info-circle-fill')+'"></i> '+msg;c.appendChild(t);setTimeout(()=>{t.style.opacity='0';setTimeout(()=>t.remove(),300)},3000)}
+
+    function openModal(html){document.getElementById('modalContainer').innerHTML='<div class="modal-overlay" onclick="if(event.target===this)closeModal()"><div class="modal-content"><div class="p-5">'+html+'</div></div></div>'}
+    window.closeModal=function(){document.getElementById('modalContainer').innerHTML=''};
+
+    window.toggleDarkMode=function(){document.documentElement.classList.toggle('dark');const isDark=document.documentElement.classList.contains('dark');localStorage.setItem('darkMode',isDark);document.getElementById('darkModeIcon').className=isDark?'bi bi-sun':'bi bi-moon-stars'};
+    if(localStorage.getItem('darkMode')==='true'){document.documentElement.classList.add('dark');document.getElementById('darkModeIcon').className='bi bi-sun'}
+
+    window.toggleNotif=function(){document.getElementById('notifDropdown').classList.toggle('hidden')};
+    window.clearNotifications=function(){document.getElementById('notif-list').innerHTML='<div class="p-3 text-center text-gray-400 text-xs">No notifications</div>';document.getElementById('notif-badge').classList.add('hidden')};
+    document.addEventListener('click',function(e){if(!e.target.closest('.relative'))document.getElementById('notifDropdown').classList.add('hidden')});
+
+    function fmtAmt(n){return '\u09F3 '+Number(n||0).toLocaleString('en-BD',{minimumFractionDigits:2,maximumFractionDigits:2})}
+    function dateStr(d){if(!d)return '';try{return new Date(d).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'})}catch(e){return d}}
+    function timeAgo(d){if(!d)return '';const ms=Date.now()-new Date(d).getTime();const m=Math.floor(ms/60000);if(m<1)return 'Just now';if(m<60)return m+'m ago';const h=Math.floor(m/60);if(h<24)return h+'h ago';return Math.floor(h/24)+'d ago'}
+
+    function statusBadge(s){const colors={pending:'bg-amber-100 text-amber-700',success:'bg-emerald-100 text-emerald-700',failed:'bg-red-100 text-red-700',refunded:'bg-blue-100 text-blue-700',hold:'bg-gray-200 text-gray-700'};return '<span class="badge '+(colors[s]||'bg-gray-100 text-gray-600')+'">'+s+'</span>'}
+    function gatewayBadge(g){const colors={bkash:'bg-pink-100 text-pink-700',nagad:'bg-orange-100 text-orange-700',rocket:'bg-purple-100 text-purple-700',upay:'bg-teal-100 text-teal-700'};const names={bkash:'bKash',nagad:'Nagad',rocket:'Rocket',upay:'Upay'};return '<span class="badge '+(colors[g]||'bg-gray-100')+'">'+(names[g]||g)+'</span>'}
+
+    function getFiltered(){
+        const search=(document.getElementById('search').value||'').toLowerCase();
+        const statusF=document.getElementById('filter-status').value;
+        const methodF=document.getElementById('filter-method').value;
+        const fromD=document.getElementById('filter-date-from').value;
+        const toD=document.getElementById('filter-date-to').value;
+        let arr=Object.entries(allTx).map(([k,v])=>({...v,id:k}));
+        if(search)arr=arr.filter(t=>(t.name||t.customerName||'').toLowerCase().includes(search)||(t.email||t.customerEmail||'').toLowerCase().includes(search)||(t.id||'').includes(search)||(t.phone||t.customerPhone||'').includes(search));
+        if(statusF!=='all')arr=arr.filter(t=>t.status===statusF);
+        if(methodF!=='all')arr=arr.filter(t=>t.method===methodF);
+        if(fromD)arr=arr.filter(t=>{try{return new Date(t.timestamp||t.date)>=new Date(fromD)}catch(e){return true}});
+        if(toD)arr=arr.filter(t=>{try{return new Date(t.timestamp||t.date)<=new Date(toD+'T23:59:59')}catch(e){return true}});
+        arr.sort((a,b)=>new Date(b.timestamp||b.date||0)-new Date(a.timestamp||a.date||0));
+        return arr;
+    }
+
+    window.renderTxTable=function(){
+        const filtered=getFiltered();const total=filtered.length;
+        const totalPages=Math.max(1,Math.ceil(total/PER_PAGE));
+        if(currentPage>totalPages)currentPage=totalPages;
+        const start=(currentPage-1)*PER_PAGE;const page=filtered.slice(start,start+PER_PAGE);
+        document.getElementById('tx-count').textContent=total;
+        const tbody=document.getElementById('tx-table');const emptyEl=document.getElementById('tx-empty');
+        if(page.length===0){tbody.innerHTML='';emptyEl.classList.remove('hidden')}
+        else{emptyEl.classList.add('hidden');tbody.innerHTML=page.map(t=>{
+            const name=t.name||t.customerName||'N/A';const email=t.email||t.customerEmail||'';
+            return '<tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50"><td class="px-5 py-3 font-mono text-xs text-gray-500">#'+(t.id||'').substring(0,8)+'</td><td class="px-5 py-3 font-medium text-gray-800 dark:text-white">'+name+'</td><td class="px-5 py-3 text-gray-500 text-xs">'+email+'</td><td class="px-5 py-3 font-semibold">'+fmtAmt(t.amount)+'</td><td class="px-5 py-3">'+gatewayBadge(t.method)+'</td><td class="px-5 py-3">'+statusBadge(t.status)+'</td><td class="px-5 py-3 text-gray-500 text-xs">'+dateStr(t.timestamp||t.date)+'</td><td class="px-5 py-3 text-right"><button onclick="viewTx(\''+t.id+'\')" class="text-bd-green hover:underline text-xs mr-2">View</button><button onclick="downloadReceipt(\''+t.id+'\')" class="text-gray-400 hover:text-gray-600 text-xs"><i class="bi bi-download"></i></button></td></tr>'}).join('')}
+        const pagEl=document.getElementById('pagination');
+        if(total>PER_PAGE){pagEl.innerHTML='<span class="text-gray-500 text-xs">Showing '+(start+1)+'-'+Math.min(start+PER_PAGE,total)+' of '+total+'</span><div class="flex gap-1"><button onclick="goPage(1)" class="px-2 py-1 border rounded text-xs '+(currentPage<=1?'text-gray-300':'hover:bg-gray-50 dark:hover:bg-gray-700')+'" '+(currentPage<=1?'disabled':'')+'><i class="bi bi-chevron-double-left"></i></button><button onclick="goPage('+(currentPage-1)+')" class="px-3 py-1 border rounded text-xs '+(currentPage<=1?'text-gray-300 cursor-not-allowed':'hover:bg-gray-50 dark:hover:bg-gray-700')+'" '+(currentPage<=1?'disabled':'')+'>Prev</button><span class="px-3 py-1 text-xs font-medium">'+currentPage+'/'+totalPages+'</span><button onclick="goPage('+(currentPage+1)+')" class="px-3 py-1 border rounded text-xs '+(currentPage>=totalPages?'text-gray-300 cursor-not-allowed':'hover:bg-gray-50 dark:hover:bg-gray-700')+'" '+(currentPage>=totalPages?'disabled':'')+'>Next</button><button onclick="goPage('+totalPages+')" class="px-2 py-1 border rounded text-xs '+(currentPage>=totalPages?'text-gray-300':'hover:bg-gray-50 dark:hover:bg-gray-700')+'" '+(currentPage>=totalPages?'disabled':'')+'><i class="bi bi-chevron-double-right"></i></button></div>'}else{pagEl.innerHTML=''}
+    };
+    window.goPage=function(p){const tp=Math.max(1,Math.ceil(getFiltered().length/PER_PAGE));if(p>=1&&p<=tp){currentPage=p;window.renderTxTable()}};
+
+    window.viewTx=function(id){const t=allTx[id];if(!t)return;const name=t.name||t.customerName||'N/A';const email=t.email||t.customerEmail||'';const phone=t.phone||t.customerPhone||'';openModal('<div class="flex justify-between items-start mb-4"><h3 class="font-bold text-lg text-gray-800 dark:text-white">Transaction Detail</h3><button onclick="closeModal()" class="text-gray-400 hover:text-gray-600"><i class="bi bi-x-lg"></i></button></div><div class="space-y-3 text-sm"><div class="flex justify-between pb-2 border-b border-gray-100 dark:border-gray-700"><span class="text-gray-500">Transaction ID</span><span class="font-mono text-xs">'+id+'</span></div><div class="flex justify-between pb-2 border-b border-gray-100 dark:border-gray-700"><span class="text-gray-500">Name</span><span class="font-medium">'+name+'</span></div><div class="flex justify-between pb-2 border-b border-gray-100 dark:border-gray-700"><span class="text-gray-500">Email</span><span>'+email+'</span></div><div class="flex justify-between pb-2 border-b border-gray-100 dark:border-gray-700"><span class="text-gray-500">Phone</span><span>'+phone+'</span></div><div class="flex justify-between pb-2 border-b border-gray-100 dark:border-gray-700"><span class="text-gray-500">Amount</span><span class="font-bold text-lg">'+fmtAmt(t.amount)+'</span></div>'+(t.originalAmount&&t.originalAmount!=t.amount?'<div class="flex justify-between pb-2 border-b border-gray-100 dark:border-gray-700"><span class="text-gray-500">Original Amount</span><span>'+fmtAmt(t.originalAmount)+'</span></div>':'')+'<div class="flex justify-between pb-2 border-b border-gray-100 dark:border-gray-700"><span class="text-gray-500">Method</span>'+gatewayBadge(t.method)+'</div><div class="flex justify-between pb-2 border-b border-gray-100 dark:border-gray-700"><span class="text-gray-500">Status</span>'+statusBadge(t.status)+'</div>'+(t.coupon?'<div class="flex justify-between pb-2 border-b border-gray-100 dark:border-gray-700"><span class="text-gray-500">Coupon</span><span class="font-mono text-xs bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded">'+t.coupon+'</span></div>':'')+(t.rating?'<div class="flex justify-between pb-2 border-b border-gray-100 dark:border-gray-700"><span class="text-gray-500">Rating</span><span class="text-amber-500">'+'<i class="bi bi-star-fill"></i>'.repeat(t.rating)+'</span></div>':'')+'<div class="flex justify-between"><span class="text-gray-500">Date</span><span>'+dateStr(t.timestamp||t.date)+'</span></div></div><div class="mt-4 flex justify-end gap-2"><button onclick="downloadReceipt(\''+id+'\')" class="px-3 py-1.5 border rounded-lg text-xs hover:bg-gray-50 dark:hover:bg-gray-700"><i class="bi bi-download mr-1"></i>Receipt</button><button onclick="shareWhatsApp(\''+id+'\')" class="px-3 py-1.5 bg-green-600 text-white rounded-lg text-xs hover:bg-green-700"><i class="bi bi-whatsapp mr-1"></i>Share</button><button onclick="closeModal()" class="px-3 py-1.5 bg-bd-green text-white rounded-lg text-xs">Close</button></div>')};
+
+    window.downloadReceipt=function(id){const t=allTx[id];if(!t)return;const w=window.open('','','width=400,height=600');w.document.write('<html><head><title>Receipt</title><style>body{font-family:sans-serif;padding:20px;max-width:350px;margin:auto}h2{color:#006A4E}table{width:100%;border-collapse:collapse;margin-top:10px}td{padding:8px 4px;border-bottom:1px solid #eee;font-size:13px}.label{color:#888}.value{font-weight:600;text-align:right}.total{font-size:24px;font-weight:700;color:#006A4E;text-align:center;margin:15px 0}</style></head><body><h2>ShighroPay Receipt</h2><p class="total">\u09F3 '+t.amount+'</p><table><tr><td class="label">ID</td><td class="value">#'+id.substring(0,12)+'</td></tr><tr><td class="label">Name</td><td class="value">'+(t.name||t.customerName||'')+'</td></tr><tr><td class="label">Email</td><td class="value">'+(t.email||t.customerEmail||'')+'</td></tr><tr><td class="label">Method</td><td class="value">'+t.method+'</td></tr><tr><td class="label">Status</td><td class="value">'+t.status+'</td></tr><tr><td class="label">Date</td><td class="value">'+dateStr(t.timestamp||t.date)+'</td></tr></table><p style="text-align:center;margin-top:30px;color:#aaa;font-size:11px">Thank you for using ShighroPay</p><scr'+'ipt>window.print()<\/scr'+'ipt></body></html>')};
+
+    window.shareWhatsApp=function(id){const t=allTx[id];if(!t)return;const text='ShighroPay Receipt\nTx: #'+id.substring(0,12)+'\nAmount: \u09F3'+t.amount+'\nMethod: '+t.method+'\nStatus: '+t.status+'\nDate: '+dateStr(t.timestamp||t.date);window.open('https://wa.me/?text='+encodeURIComponent(text),'_blank')};
+
+    // Export functions
+    window.exportTxCSV=function(){const data=getFiltered();const rows=[['ID','Name','Email','Phone','Amount','Method','Status','Date']];data.forEach(t=>rows.push([t.id,t.name||t.customerName||'',t.email||t.customerEmail||'',t.phone||t.customerPhone||'',t.amount,t.method,t.status,t.timestamp||t.date||'']));const csv=rows.map(r=>r.map(c=>'"'+(c+'').replace(/"/g,'""')+'"').join(',')).join('\n');const blob=new Blob([csv],{type:'text/csv'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='transactions_'+new Date().toISOString().split('T')[0]+'.csv';a.click();showToast('CSV exported','success')};
+
+    window.exportJSON=function(){const data=getFiltered();const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='transactions_'+new Date().toISOString().split('T')[0]+'.json';a.click();showToast('JSON exported','success')};
+
+    window.exportPDF=function(){const data=getFiltered();const w=window.open('','','width=800,height=600');let rows='';data.forEach(t=>{rows+='<tr><td>'+t.id.substring(0,10)+'</td><td>'+(t.name||t.customerName||'')+'</td><td>\u09F3'+t.amount+'</td><td>'+t.method+'</td><td>'+t.status+'</td><td>'+dateStr(t.timestamp||t.date)+'</td></tr>'});w.document.write('<html><head><title>Transaction Report</title><style>body{font-family:sans-serif;padding:30px}h2{color:#006A4E}table{width:100%;border-collapse:collapse;margin-top:15px;font-size:12px}th,td{padding:8px;border:1px solid #e5e7eb;text-align:left}th{background:#f9fafb;font-weight:600}tr:nth-child(even){background:#f9fafb}.header{display:flex;justify-content:space-between;align-items:center}.date{color:#888;font-size:12px}</style></head><body><div class="header"><h2>ShighroPay - Transaction Report</h2><span class="date">Generated: '+new Date().toLocaleString('en-GB')+'</span></div><p style="color:#666;font-size:13px">Total: '+data.length+' transactions | Amount: '+fmtAmt(data.filter(t=>t.status==='success').reduce((s,t)=>s+Number(t.amount||0),0))+'</p><table><thead><tr><th>ID</th><th>Name</th><th>Amount</th><th>Method</th><th>Status</th><th>Date</th></tr></thead><tbody>'+rows+'</tbody></table><scr'+'ipt>window.print()<\/scr'+'ipt></body></html>')};
+
+    window.openProfileModal=function(){const name=currentUser?currentUser.displayName||'Anonymous':'User';const email=currentUser?currentUser.email||'N/A':'N/A';const uid=currentUser?currentUser.uid:'N/A';const txArr=Object.values(allTx);const successTx=txArr.filter(t=>t.status==='success');const totalSpent=successTx.reduce((s,t)=>s+Number(t.amount||0),0);const avgAmount=successTx.length>0?totalSpent/successTx.length:0;const favMethod=txArr.length>0?Object.entries(txArr.reduce((acc,t)=>{acc[t.method]=(acc[t.method]||0)+1;return acc},{})).sort((a,b)=>b[1]-a[1])[0]?.[0]||'N/A':'N/A';const methodNames={bkash:'bKash',nagad:'Nagad',rocket:'Rocket',upay:'Upay'};openModal('<div class="flex justify-between items-start mb-4"><h3 class="font-bold text-lg text-gray-800 dark:text-white">Profile & Stats</h3><button onclick="closeModal()" class="text-gray-400 hover:text-gray-600"><i class="bi bi-x-lg"></i></button></div><div class="text-center mb-5"><div class="w-20 h-20 bg-bd-green rounded-full flex items-center justify-center text-white text-3xl font-bold mx-auto mb-3 shadow-lg">'+name.charAt(0).toUpperCase()+'</div><h4 class="font-bold text-lg text-gray-800 dark:text-white">'+name+'</h4><p class="text-xs text-gray-500">'+email+'</p><p class="text-[10px] text-gray-400 font-mono mt-1">UID: '+uid.substring(0,16)+'</p></div><div class="grid grid-cols-2 gap-3 mb-4"><div class="bg-emerald-50 dark:bg-emerald-900/30 p-3 rounded-xl text-center"><p class="text-xs text-gray-500">Total Spent</p><p class="font-bold text-emerald-600">'+fmtAmt(totalSpent)+'</p></div><div class="bg-blue-50 dark:bg-blue-900/30 p-3 rounded-xl text-center"><p class="text-xs text-gray-500">Transactions</p><p class="font-bold text-blue-600">'+txArr.length+'</p></div><div class="bg-purple-50 dark:bg-purple-900/30 p-3 rounded-xl text-center"><p class="text-xs text-gray-500">Avg Amount</p><p class="font-bold text-purple-600">'+fmtAmt(avgAmount)+'</p></div><div class="bg-amber-50 dark:bg-amber-900/30 p-3 rounded-xl text-center"><p class="text-xs text-gray-500">Favorite</p><p class="font-bold text-amber-600">'+(methodNames[favMethod]||favMethod)+'</p></div></div><div class="space-y-2 text-sm"><div class="flex justify-between pb-2 border-b border-gray-100 dark:border-gray-700"><span class="text-gray-500">Success Rate</span><span class="font-semibold text-emerald-600">'+(txArr.length>0?((successTx.length/txArr.length)*100).toFixed(1):0)+'%</span></div><div class="flex justify-between pb-2 border-b border-gray-100 dark:border-gray-700"><span class="text-gray-500">First Transaction</span><span class="text-xs">'+(txArr.length>0?dateStr(txArr.sort((a,b)=>new Date(a.timestamp||a.date||0)-new Date(b.timestamp||b.date||0))[0]?.timestamp||'N/A'):'N/A')+'</span></div><div class="flex justify-between"><span class="text-gray-500">Member Since</span><span class="text-xs">'+new Date().toLocaleDateString('en-GB',{month:'short',year:'numeric'})+'</span></div></div>')};
+
+    window.setChartType=function(type){chartType=type;document.getElementById('chart-type-amount').className='text-[10px] px-2 py-1 rounded '+(type==='amount'?'bg-bd-green text-white':'bg-gray-100 dark:bg-gray-700 text-gray-500');document.getElementById('chart-type-count').className='text-[10px] px-2 py-1 rounded '+(type==='count'?'bg-bd-green text-white':'bg-gray-100 dark:bg-gray-700 text-gray-500');updateStats()};
+
+    function updateStats(){
+        const txArr=Object.values(allTx);
+        const total=txArr.length;const success=txArr.filter(t=>t.status==='success');const pending=txArr.filter(t=>t.status==='pending');const failed=txArr.filter(t=>t.status==='failed');
+        document.getElementById('stat-total').textContent=total;
+        document.getElementById('stat-paid').textContent=success.length;
+        document.getElementById('stat-pending').textContent=pending.length;
+        document.getElementById('stat-failed').textContent=failed.length;
+        document.getElementById('stat-amount').textContent=fmtAmt(success.reduce((s,t)=>s+Number(t.amount||0),0));
+
+        // Notifications
+        const nb=document.getElementById('notif-badge');const nl=document.getElementById('notif-list');
+        const recentTx=txArr.sort((a,b)=>new Date(b.timestamp||b.date||0)-new Date(a.timestamp||a.date||0)).slice(0,5);
+        if(recentTx.length>0){const pendingCount=pending.length;if(pendingCount>0){nb.textContent=pendingCount>9?'9+':pendingCount;nb.classList.remove('hidden')}else{nb.classList.add('hidden')}nl.innerHTML=recentTx.map(t=>{const icon=t.status==='success'?'check-circle text-emerald-500':t.status==='pending'?'hourglass-split text-amber-500':'x-circle text-red-500';return '<div class="px-3 py-2 border-b border-gray-50 dark:border-gray-700 flex items-start gap-2 text-xs"><i class="bi bi-'+icon+' mt-0.5"></i><div><span class="font-medium">'+(t.name||t.customerName||'N/A')+'</span> - '+fmtAmt(t.amount)+'<br><span class="text-gray-400">'+timeAgo(t.timestamp||t.date)+'</span></div></div>'}).join('')}else{nb.classList.add('hidden');nl.innerHTML='<div class="p-3 text-center text-gray-400 text-xs">No notifications</div>'}
+
+        // 7-day chart
+        const days=[];const dayData=[];
+        for(let i=6;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);const key=d.toISOString().split('T')[0];days.push(d.toLocaleDateString('en-GB',{day:'2-digit',month:'short'}));const dayTx=success.filter(t=>{try{return new Date(t.timestamp||t.date).toISOString().split('T')[0]===key}catch(e){return false}});dayData.push(chartType==='amount'?dayTx.reduce((s,t)=>s+Number(t.amount||0),0):dayTx.length)}
+        const maxVal=Math.max(...dayData,1);
+        document.getElementById('chart-bars').innerHTML=dayData.map((val,i)=>{const pct=(val/maxVal)*100;return '<div class="flex-1 flex flex-col items-center justify-end h-full"><span class="text-[9px] text-gray-500 mb-1">'+(val>0?(chartType==='amount'?fmtAmt(val):val):'')+'</span><div class="w-full rounded-t-md bg-gradient-to-t from-bd-green to-emerald-400 transition-all hover:opacity-80" style="height:'+Math.max(pct,2)+'%"></div></div>'}).join('');
+        document.getElementById('chart-labels').innerHTML=days.map(d=>'<span class="flex-1 text-center">'+d+'</span>').join('');
+
+        // Method breakdown
+        const methods=['bkash','nagad','rocket','upay'];const methodNames={bkash:'bKash',nagad:'Nagad',rocket:'Rocket',upay:'Upay'};const methodColors={bkash:'bg-pink-600',nagad:'bg-orange-500',rocket:'bg-purple-700',upay:'bg-teal-500'};
+        const gt=Math.max(total,1);
+        document.getElementById('method-stats').innerHTML=methods.map(m=>{const c=txArr.filter(t=>t.method===m).length;const pct=((c/gt)*100).toFixed(1);return '<div><div class="flex justify-between text-sm mb-1"><span class="text-gray-600 dark:text-gray-400">'+methodNames[m]+'</span><span class="font-bold text-xs text-gray-800 dark:text-white">'+c+' ('+pct+'%)</span></div><div class="w-full bg-gray-100 dark:bg-gray-700 rounded-full h-2"><div class="'+methodColors[m]+' h-2 rounded-full transition-all" style="width:'+pct+'%"></div></div></div>'}).join('');
+
+        // Status breakdown
+        const statuses=[{key:'success',label:'Success',color:'bg-emerald-500'},{key:'pending',label:'Pending',color:'bg-amber-500'},{key:'failed',label:'Failed',color:'bg-red-500'},{key:'refunded',label:'Refunded',color:'bg-blue-500'}];
+        document.getElementById('status-breakdown').innerHTML=statuses.map(s=>{const c=txArr.filter(t=>t.status===s.key).length;const pct=((c/gt)*100).toFixed(1);return '<div class="flex items-center gap-2"><div class="w-2 h-2 rounded-full '+s.color+'"></div><span class="text-xs text-gray-500 flex-1">'+s.label+'</span><span class="text-xs font-bold">'+c+'</span></div>'}).join('');
+
+        // Activity timeline
+        const recent=txArr.sort((a,b)=>new Date(b.timestamp||b.date||0)-new Date(a.timestamp||a.date||0)).slice(0,8);
+        document.getElementById('activity-count').textContent=recent.length+' recent';
+        document.getElementById('activity-timeline').innerHTML=recent.length>0?recent.map(t=>{const dotColor=t.status==='success'?'bg-emerald-500':t.status==='pending'?'bg-amber-500':'bg-red-500';return '<div class="flex gap-3"><div class="activity-dot '+dotColor+'"></div><div class="flex-1 pb-3 border-b border-gray-50 dark:border-gray-700"><div class="flex justify-between items-start"><span class="text-sm font-medium text-gray-800 dark:text-white">'+(t.name||t.customerName||'Unknown')+' - '+fmtAmt(t.amount)+'</span><span class="text-[10px] text-gray-400">'+timeAgo(t.timestamp||t.date)+'</span></div><span class="text-xs text-gray-500">'+t.method+' \u2022 '+t.status+'</span></div></div>'}).join(''):'<p class="text-center text-gray-400 text-sm py-4">No activity yet</p>';
+    }
+
+    // Auth & Init
+    onAuthStateChanged(auth,function(user){if(user){currentUser=user;document.getElementById('user-avatar').textContent=(user.displayName||'U').charAt(0).toUpperCase();document.getElementById('user-name').textContent=user.displayName||'User';onValue(ref(db,'transactions'),function(snap){allTx=snap.val()||{};updateStats();window.renderTxTable()});onValue(ref(db,'announcements'),function(snap){const anns=snap.val()||{};const active=Object.values(anns).filter(a=>a.active);if(active.length>0){document.getElementById('announcements-section').classList.remove('hidden');document.getElementById('announcement-content').innerHTML='<h4 class="font-bold">'+active[0].title+'</h4><p class="text-sm text-emerald-100">'+active[0].content+'</p>'}else{document.getElementById('announcements-section').classList.add('hidden')}})}});
+    signInAnonymously(auth).catch(err=>{showToast('Connection failed: '+err.message,'error')});
+</script>
+</body>
+</html>
